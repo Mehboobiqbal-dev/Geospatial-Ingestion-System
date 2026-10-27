@@ -45,6 +45,87 @@ services:
     depends_on:
       - postgres
 
+  # ----------------------------------------------------------
+  # IRIS-WSG-TH (profile "wsg"): isolated staging PostGIS, the ingestion CLI
+  # and its test runner. Not started by a plain "docker compose up".
+  #   docker compose --profile wsg up -d postgis-staging
+  #   docker compose --profile wsg run --rm wsg-ingest init-db
+  #   docker compose --profile wsg run --rm wsg-tests
+  # ----------------------------------------------------------
+
+  postgis-staging:
+
+    profiles: ["wsg"]
+
+    image: postgis/postgis:17-3.5
+
+    container_name: iris-wsg-postgis-staging
+
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: iris_staging_dev
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${WSG_POSTGRES_PASSWORD:-}
+      IRIS_STAGING_WRITER_PASSWORD: ${IRIS_STAGING_WRITER_PASSWORD:-}
+      IRIS_STAGING_TEST_DB: iris_staging_test
+
+    # Bound to localhost only; this database is for development and tests.
+    ports:
+      - "127.0.0.1:5434:5432"
+
+    volumes:
+      - wsg_staging_data:/var/lib/postgresql/data
+      - ./docker/postgis-staging/initdb:/docker-entrypoint-initdb.d:ro
+
+    # The TCP probe fails while first initialisation runs (socket-only server);
+    # the test database is created last by the init script, so its presence
+    # proves the init finished. A failed init therefore never turns healthy.
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U postgres -d iris_staging_dev && psql -U postgres -d iris_staging_test -Atqc 'SELECT 1'"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+
+  wsg-ingest:
+
+    profiles: ["wsg"]
+
+    build:
+      context: .
+      target: runtime
+
+    image: iris-wsg-th:local
+
+    environment:
+      IRIS_ENVIRONMENT: ${IRIS_ENVIRONMENT:-development}
+      IRIS_STAGING_DATABASE_URL: postgresql+psycopg://iris_staging_writer:${IRIS_STAGING_WRITER_PASSWORD:-}@postgis-staging:5432/iris_staging_dev
+      IRIS_STAGING_ALLOWED_HOSTS: postgis-staging
+
+    depends_on:
+      postgis-staging:
+        condition: service_healthy
+
+  wsg-tests:
+
+    profiles: ["wsg"]
+
+    build:
+      context: .
+      target: test
+
+    image: iris-wsg-th:test
+
+    environment:
+      IRIS_TEST_DATABASE_URL: postgresql+psycopg://iris_staging_writer:${IRIS_STAGING_WRITER_PASSWORD:-}@postgis-staging:5432/iris_staging_test
+
+    depends_on:
+      postgis-staging:
+        condition: service_healthy
+
 volumes:
 
   postgres_data:
+
+  wsg_staging_data:
