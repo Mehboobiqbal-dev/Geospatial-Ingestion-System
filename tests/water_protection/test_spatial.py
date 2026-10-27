@@ -28,8 +28,14 @@ def parcel(x0: float, y0: float, x1: float, y1: float) -> Polygon:
         ("inside, sharing the zone edge", parcel(0, 0, 20, 20), ParcelZoneRelation.WITHIN, True, True, True),
         ("identical to the zone", parcel(0, 0, 100, 100), ParcelZoneRelation.WITHIN, True, True, True),
         ("outside, sharing an edge", parcel(100, 0, 150, 50), ParcelZoneRelation.BOUNDARY_CONTACT, False, False, True),
-        ("outside, touching a corner", parcel(100, 100, 120, 120), ParcelZoneRelation.BOUNDARY_CONTACT, False, False,
-         True),
+        (
+            "outside, touching a corner",
+            parcel(100, 100, 120, 120),
+            ParcelZoneRelation.BOUNDARY_CONTACT,
+            False,
+            False,
+            True,
+        ),
         ("half inside", parcel(50, 0, 150, 100), ParcelZoneRelation.PARTIAL_OVERLAP, False, True, True),
         ("covering the zone", parcel(-10, -10, 110, 110), ParcelZoneRelation.PARTIAL_OVERLAP, False, True, True),
         ("disjoint", parcel(200, 200, 210, 210), ParcelZoneRelation.DISJOINT, False, False, False),
@@ -86,7 +92,11 @@ def test_multipart_parcel_within_zone() -> None:
 
 @pytest.mark.parametrize(
     "bad",
-    [LineString([(X, Y), (X + 1, Y + 1)]), Polygon(), Polygon([(X, Y), (X + 1, Y + 1), (X + 1, Y), (X, Y + 1), (X, Y)])],
+    [
+        LineString([(X, Y), (X + 1, Y + 1)]),
+        Polygon(),
+        Polygon([(X, Y), (X + 1, Y + 1), (X + 1, Y), (X, Y + 1), (X, Y)]),
+    ],
 )
 def test_invalid_inputs_are_refused(bad) -> None:
     with pytest.raises(ValueError):

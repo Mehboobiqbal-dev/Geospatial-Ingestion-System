@@ -78,7 +78,7 @@ def collection(
         '<?xml version="1.0" encoding="UTF-8"?>\n'
         f'<wfs:FeatureCollection {NAMESPACES} numberMatched="{matched}" '
         f'numberReturned="{returned}" timeStamp="{time_stamp}">\n{members}\n</wfs:FeatureCollection>\n'
-    ).encode("utf-8")
+    ).encode()
 
 
 def zone_properties(

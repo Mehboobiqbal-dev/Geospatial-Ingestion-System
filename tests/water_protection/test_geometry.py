@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+import warnings
 
 import pytest
 from pyproj import Transformer
@@ -21,7 +22,9 @@ POLICY = GeometryPolicy()
 
 
 def normalize(shape, srs: str | None = URN_25832, policy: GeometryPolicy = POLICY, fallback: str | None = None):
-    return normalize_geometry(RawGeometry(shape=shape, srs_name=srs, gml_type=None), fallback_srs=fallback, policy=policy)
+    return normalize_geometry(
+        RawGeometry(shape=shape, srs_name=srs, gml_type=None), fallback_srs=fallback, policy=policy
+    )
 
 
 def rejected(shape, srs: str | None = URN_25832, **kwargs) -> RecordRejected:
@@ -85,6 +88,13 @@ def test_traditional_epsg_form_is_not_swapped() -> None:
     assert from_xy.geometry.equals_exact(from_urn.geometry, tolerance=1e-6)
 
 
+def polygon_with_coordinate(value: float) -> Polygon:
+    # Shapely warns when building a ring with NaN; that bad input is the point of the test.
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", RuntimeWarning)
+        return Polygon([(640000, 5650000), (value, 5650000), (640000, 5650100), (640000, 5650000)])
+
+
 def test_declared_default_crs_is_used_when_geometry_has_none() -> None:
     result = normalize(Polygon(square(640000, 5650000, 10)), srs=None, fallback=URN_25832)
     assert result.source_srs_name == URN_25832
@@ -95,10 +105,8 @@ def test_declared_default_crs_is_used_when_geometry_has_none() -> None:
     [
         (None, URN_25832, "missing_geometry"),
         (Polygon(), URN_25832, "empty_geometry"),
-        (Polygon([(640000, 5650000), (math.nan, 5650000), (640000, 5650100), (640000, 5650000)]), URN_25832,
-         "non_finite_coordinates"),
-        (Polygon([(640000, 5650000), (math.inf, 5650000), (640000, 5650100), (640000, 5650000)]), URN_25832,
-         "non_finite_coordinates"),
+        (polygon_with_coordinate(math.nan), URN_25832, "non_finite_coordinates"),
+        (polygon_with_coordinate(math.inf), URN_25832, "non_finite_coordinates"),
         (LineString([(640000, 5650000), (640100, 5650100)]), URN_25832, "unsupported_geometry_type"),
         (Point(640000, 5650000), URN_25832, "unsupported_geometry_type"),
         (Polygon(square(640000, 5650000, 10)), None, "unknown_crs"),
@@ -110,8 +118,13 @@ def test_irrecoverable_geometries_are_rejected(shape, srs, reason: str) -> None:
 
 
 def test_parse_errors_are_passed_through() -> None:
-    raw = RawGeometry(shape=None, srs_name=URN_25832, gml_type="Polygon", error_code="malformed_geometry",
-                      error_detail="LinearRing is not closed")
+    raw = RawGeometry(
+        shape=None,
+        srs_name=URN_25832,
+        gml_type="Polygon",
+        error_code="malformed_geometry",
+        error_detail="LinearRing is not closed",
+    )
     with pytest.raises(RecordRejected) as excinfo:
         normalize_geometry(raw, fallback_srs=None, policy=POLICY)
     assert (excinfo.value.reason_code, excinfo.value.detail) == ("malformed_geometry", "LinearRing is not closed")
@@ -119,8 +132,16 @@ def test_parse_errors_are_passed_through() -> None:
 
 def test_spike_is_repaired_with_evidence() -> None:
     spike = Polygon(
-        [(644500, 5650000), (644600, 5650000), (644600, 5650050), (644650, 5650050),
-         (644600, 5650050), (644600, 5650100), (644500, 5650100), (644500, 5650000)]
+        [
+            (644500, 5650000),
+            (644600, 5650000),
+            (644600, 5650050),
+            (644650, 5650050),
+            (644600, 5650050),
+            (644600, 5650100),
+            (644500, 5650100),
+            (644500, 5650000),
+        ]
     )
     assert not spike.is_valid
 

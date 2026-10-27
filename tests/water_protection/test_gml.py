@@ -86,13 +86,13 @@ def test_pos_elements_and_3d_coordinates() -> None:
             "not closed",
         ),
         (
-            '<gml:Polygon><gml:exterior><gml:LinearRing><gml:posList>0 0 1 x 1 1 0 0</gml:posList>'
+            "<gml:Polygon><gml:exterior><gml:LinearRing><gml:posList>0 0 1 x 1 1 0 0</gml:posList>"
             "</gml:LinearRing></gml:exterior></gml:Polygon>",
             "malformed_geometry",
             "non-numeric",
         ),
         (
-            '<gml:Polygon><gml:exterior><gml:Ring><gml:curveMember/></gml:Ring></gml:exterior></gml:Polygon>',
+            "<gml:Polygon><gml:exterior><gml:Ring><gml:curveMember/></gml:Ring></gml:exterior></gml:Polygon>",
             "unsupported_geometry_type",
             "Ring",
         ),
@@ -102,10 +102,9 @@ def test_pos_elements_and_3d_coordinates() -> None:
             "Solid",
         ),
         (
-            '<gml:MultiSurface><gml:surfaceMember><gml:Polygon srsName="EPSG:25832"><gml:exterior><gml:LinearRing>'
-            "<gml:posList>0 0 1 0 1 1 0 0</gml:posList></gml:LinearRing></gml:exterior></gml:Polygon></gml:surfaceMember>"
-            '<gml:surfaceMember><gml:Polygon srsName="EPSG:4326"><gml:exterior><gml:LinearRing>'
-            "<gml:posList>0 0 1 0 1 1 0 0</gml:posList></gml:LinearRing></gml:exterior></gml:Polygon></gml:surfaceMember>"
+            "<gml:MultiSurface>"
+            f"<gml:surfaceMember>{polygon(square(0, 0, 1), srs='EPSG:25832')}</gml:surfaceMember>"
+            f"<gml:surfaceMember>{polygon(square(0, 0, 1), srs='EPSG:4326')}</gml:surfaceMember>"
             "</gml:MultiSurface>",
             "malformed_geometry",
             "mixed srsName",
@@ -136,9 +135,9 @@ def test_unknown_number_matched() -> None:
 
 
 def test_repeated_property_becomes_a_list() -> None:
-    content = collection(
-        [feature("f.1", zone_properties("Z-1", "I"), multisurface(polygon(square(0, 0, 1))))]
-    ).replace(b"<wsg:zone>I</wsg:zone>", b"<wsg:zone>I</wsg:zone><wsg:zone>II</wsg:zone>")
+    content = collection([feature("f.1", zone_properties("Z-1", "I"), multisurface(polygon(square(0, 0, 1))))]).replace(
+        b"<wsg:zone>I</wsg:zone>", b"<wsg:zone>I</wsg:zone><wsg:zone>II</wsg:zone>"
+    )
     assert parse(content).features[0].properties["zone"] == ["I", "II"]
 
 
