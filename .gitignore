@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+
+# Tooling caches and coverage
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+
+# Local configuration and secrets (the template is committed)
+.env
+.env.*
+!.env.example
+
+# Local run output: reports, exports, inspections, pipeline data
+data/
+reports/
+*.gpkg
+*.gpkg-journal
+*.gpkg-shm
+*.gpkg-wal
+inspection*.json
+
+# Editors and OS files
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Scratch and dump files from the base repository (not part of the application)
+temp_css.txt
+transformer_current.txt
+database_facility_pairs.txt
+test_overpass_query.txt
+pipeline_context.md
