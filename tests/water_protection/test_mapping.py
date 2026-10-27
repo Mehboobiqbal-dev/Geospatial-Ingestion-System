@@ -52,7 +52,9 @@ def test_default_mapping_is_marked_unverified(mapping: LayerMapping) -> None:
         ("IIIB", "ZONE_IIIB", "Schutzzone III B (Weitere Schutzzone, Teilzone B)"),
     ],
 )
-def test_official_codes_map_through_the_table(mapping: LayerMapping, code: str, category: str, description: str) -> None:
+def test_official_codes_map_through_the_table(
+    mapping: LayerMapping, code: str, category: str, description: str
+) -> None:
     result = map_attributes(raw(zone=code), mapping)
 
     assert result.zone_category == category
@@ -221,7 +223,26 @@ def test_invalid_mapping_files_are_rejected(tmp_path: Path, old: str, new: str, 
 
 
 def test_editing_the_mapping_changes_its_identifier(tmp_path: Path, mapping: LayerMapping) -> None:
-    edited = load_mapping(write_variant(tmp_path, 'legal_description = "Schutzzone I (Fassungsbereich)"',
-                                        'legal_description = "Schutzzone I (Fassungsbereich, Brunnen)"'))
+    edited = load_mapping(
+        write_variant(
+            tmp_path,
+            'legal_description = "Schutzzone I (Fassungsbereich)"',
+            'legal_description = "Schutzzone I (Fassungsbereich, Brunnen)"',
+        )
+    )
     assert edited.version == mapping.version
     assert edited.identifier != mapping.identifier
+
+
+def test_identifier_ignores_line_endings_and_comments(tmp_path: Path, mapping: LayerMapping) -> None:
+    text = DEFAULT_MAPPING.read_bytes().decode("utf-8").replace("\r\n", "\n")
+    lf = tmp_path / "lf.toml"
+    crlf = tmp_path / "crlf.toml"
+    commented = tmp_path / "commented.toml"
+    lf.write_bytes(text.encode())
+    crlf.write_bytes(text.replace("\n", "\r\n").encode())
+    commented.write_bytes((text + "\n# reviewed on 2026-10-27\n").encode())
+
+    identifiers = {load_mapping(path).identifier for path in (lf, crlf, commented)}
+
+    assert identifiers == {mapping.identifier}

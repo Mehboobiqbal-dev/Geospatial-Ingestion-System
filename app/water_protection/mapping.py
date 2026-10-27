@@ -14,6 +14,7 @@ label, a substring or a similar-looking code.
 from __future__ import annotations
 
 import hashlib
+import json
 import re
 import tomllib
 from dataclasses import dataclass
@@ -94,7 +95,7 @@ class LayerMapping:
 
     @property
     def identifier(self) -> str:
-        """Version plus content digest: any edit to the file changes it."""
+        """Version plus content digest: any change to the mapping values changes it."""
         return f"{self.version}+{self.digest[:12]}"
 
     def required_properties(self) -> dict[str, str]:
@@ -125,7 +126,10 @@ def load_mapping(path: Path | None = None) -> LayerMapping:
         document = tomllib.loads(raw.decode("utf-8"))
     except (tomllib.TOMLDecodeError, UnicodeDecodeError) as exc:
         raise MappingError(f"mapping file {source} is not valid TOML: {exc}") from exc
-    return _build_mapping(document, digest=hashlib.sha256(raw).hexdigest(), source=source)
+    # Digest of the parsed document, not the file bytes: CRLF/LF checkouts and
+    # comment edits must not change mapping_version (it feeds content_hash).
+    canonical = json.dumps(document, sort_keys=True, ensure_ascii=False).encode()
+    return _build_mapping(document, digest=hashlib.sha256(canonical).hexdigest(), source=source)
 
 
 def _build_mapping(document: dict[str, Any], *, digest: str, source: str) -> LayerMapping:
@@ -145,7 +149,7 @@ def _build_mapping(document: dict[str, Any], *, digest: str, source: str) -> Lay
 
     def property_name(value: Any, where: str) -> str | None:
         if not isinstance(value, str):
-            raise MappingError(f"{where} must be a string (use \"\" for not published)")
+            raise MappingError(f'{where} must be a string (use "" for not published)')
         value = value.strip()
         if not value:
             return None
@@ -158,8 +162,7 @@ def _build_mapping(document: dict[str, Any], *, digest: str, source: str) -> Lay
     missing = expected - set(fields_doc)
     if unknown or missing:
         raise MappingError(
-            f"[fields] must define exactly {sorted(expected)}; "
-            f"unknown={sorted(unknown)} missing={sorted(missing)}"
+            f"[fields] must define exactly {sorted(expected)}; unknown={sorted(unknown)} missing={sorted(missing)}"
         )
     field_map = FieldMap(**{name: property_name(fields_doc[name], f"fields.{name}") for name in expected})
 
@@ -235,7 +238,11 @@ class MappedAttributes:
 
     def to_hashable_dict(self) -> dict[str, Any]:
         return {
-            f.name: (str(getattr(self, f.name)) if isinstance(getattr(self, f.name), (date, Decimal)) else getattr(self, f.name))
+            f.name: (
+                str(getattr(self, f.name))
+                if isinstance(getattr(self, f.name), (date, Decimal))
+                else getattr(self, f.name)
+            )
             for f in dataclass_fields(self)
         }
 
