@@ -14,7 +14,7 @@ FROM iris_staging.water_protection_zones
 GROUP BY 1, 2
 HAVING count(*) > 1;
 
-\echo '3. Geometry: type, SRID and validity (expect one row: ST_MultiPolygon, 25832, all valid)'
+\echo '3. Geometry: type, SRID and validity (expect one row: MULTIPOLYGON, 25832, all valid)'
 SELECT GeometryType(geom) AS geometry_type,
        ST_SRID(geom) AS srid,
        count(*) AS zones,

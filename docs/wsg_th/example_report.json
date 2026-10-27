@@ -1,0 +1,122 @@
+{
+  "run_id": "0f32ac53-756b-4769-9b16-78bd0f04b557",
+  "mode": "load",
+  "status": "succeeded_with_rejections",
+  "started_at": "2026-10-27T22:30:45.021159+00:00",
+  "finished_at": "2026-10-27T22:30:45.102826+00:00",
+  "source": {
+    "kind": "file",
+    "path": "/fixtures/getfeature_edge_cases.xml",
+    "sha256": "57671146d3984ae608506bd2b02b5434662e351b071515a3089d662fe40a4578",
+    "layer": "th_wsg_zonen",
+    "number_matched": 18,
+    "server_time_stamp": "2026-10-27T12:00:00Z"
+  },
+  "mapping": {
+    "identifier": "2026-10-27.1+28ec2cd5de04",
+    "source": "package:app/water_protection/mappings/th_wsg_zonen.toml",
+    "schema_verified": false,
+    "verification_note": "Live schema not inspectable (bot protection / HTTP 404 on 2026-10-27); property names are fixture assumptions."
+  },
+  "schema": {
+    "checked": false,
+    "reason": "no DescribeFeatureType for file input"
+  },
+  "counts": {
+    "retrieved": 18,
+    "accepted": 9,
+    "rejected": 8,
+    "duplicates_collapsed": 1,
+    "repaired": 1,
+    "with_warnings": 3,
+    "multipart": 1
+  },
+  "zone_categories": {
+    "UNKNOWN": 2,
+    "ZONE_I": 1,
+    "ZONE_II": 2,
+    "ZONE_III": 1,
+    "ZONE_IIIA": 1,
+    "ZONE_IIIB": 2
+  },
+  "source_crs": {
+    "EPSG:25832": 8,
+    "EPSG:4326": 1
+  },
+  "transformations": [
+    "EPSG:25832: none (source CRS is EPSG:25832)",
+    "EPSG:4326: Inverse of ETRS89 to WGS 84 (1) + UTM zone 32N (with axis order normalized for visualization); accuracy 1.0 m"
+  ],
+  "rejections_by_reason": {
+    "conflicting_duplicate_source_id": 2,
+    "malformed_geometry": 1,
+    "missing_geometry": 1,
+    "missing_source_zone_id": 1,
+    "outside_plausibility_extent": 1,
+    "repair_exceeds_tolerance": 1,
+    "unsupported_geometry_type": 1
+  },
+  "warnings_by_code": {
+    "geometry_repaired": 1,
+    "missing_zone_code": 1,
+    "unknown_zone_code": 1
+  },
+  "rejected_samples": [
+    {
+      "record_key": "TEST-Z-008",
+      "reason": "repair_exceeds_tolerance",
+      "detail": "repair would change the area by an undefined ratio (limit 0.1000%); invalid reason: Self-intersection[645050 5650050]"
+    },
+    {
+      "record_key": "TEST-Z-009",
+      "reason": "missing_geometry",
+      "detail": "feature has no geometry"
+    },
+    {
+      "record_key": "th_wsg_zonen.10",
+      "reason": "missing_source_zone_id",
+      "detail": "property 'zone_id' is missing or empty"
+    },
+    {
+      "record_key": "TEST-Z-011",
+      "reason": "unsupported_geometry_type",
+      "detail": "LineString is not a polygon"
+    },
+    {
+      "record_key": "TEST-Z-012",
+      "reason": "malformed_geometry",
+      "detail": "posList has 5 values, not a multiple of dimension 2"
+    },
+    {
+      "record_key": "TEST-Z-013",
+      "reason": "outside_plausibility_extent",
+      "detail": "bounds (5650000.0, 646000.0, 5650100.0, 646100.0) in EPSG:25832 lie outside the plausibility extent; check axis order and declared CRS"
+    },
+    {
+      "record_key": "th_wsg_zonen.16",
+      "reason": "conflicting_duplicate_source_id",
+      "detail": "2 features share source_zone_id 'TEST-Z-016' with different content"
+    },
+    {
+      "record_key": "th_wsg_zonen.17",
+      "reason": "conflicting_duplicate_source_id",
+      "detail": "2 features share source_zone_id 'TEST-Z-016' with different content"
+    }
+  ],
+  "database": {
+    "inserted": 9,
+    "updated": 0,
+    "unchanged": 0,
+    "quarantined": 8,
+    "batches": 1,
+    "absent_from_source": 0,
+    "absent_from_source_sample": [],
+    "stale_after_rejection": 0,
+    "stale_after_rejection_sample": []
+  },
+  "error": null,
+  "notes": [
+    "Mapping is not verified against the live schema; source property names are assumptions.",
+    "Loaded with --allow-unverified-mapping."
+  ]
+}
