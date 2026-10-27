@@ -82,8 +82,7 @@ class WfsCapabilities:
         available = ", ".join(sorted(ft.name for ft in self.feature_types)) or "(none)"
         if len(by_local) > 1:
             raise CapabilitiesError(
-                f"layer name {layer!r} is ambiguous; advertised matches: "
-                f"{[ft.name for ft in by_local]}",
+                f"layer name {layer!r} is ambiguous; advertised matches: {[ft.name for ft in by_local]}",
                 operation=operation,
             )
         raise CapabilitiesError(
@@ -208,9 +207,7 @@ def _feature_type(node: etree._Element) -> FeatureTypeInfo:
 
     default_crs = text_of(first_child(node, "DefaultCRS")) or text_of(first_child(node, "DefaultSRS"))
     other_crs = tuple(
-        value
-        for value in (text_of(el) for el in children(node, "OtherCRS") + children(node, "OtherSRS"))
-        if value
+        value for value in (text_of(el) for el in children(node, "OtherCRS") + children(node, "OtherSRS")) if value
     )
 
     bbox: tuple[float, float, float, float] | None = None
@@ -224,9 +221,11 @@ def _feature_type(node: etree._Element) -> FeatureTypeInfo:
             bbox = None
 
     formats_el = first_child(node, "OutputFormats")
-    formats = tuple(
-        value for value in (text_of(f) for f in children(formats_el, "Format")) if value
-    ) if formats_el is not None else ()
+    formats = (
+        tuple(value for value in (text_of(f) for f in children(formats_el, "Format")) if value)
+        if formats_el is not None
+        else ()
+    )
 
     return FeatureTypeInfo(
         name=name,

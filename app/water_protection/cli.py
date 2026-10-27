@@ -74,7 +74,9 @@ def build_parser() -> argparse.ArgumentParser:
         ("load", "retrieve, validate and upsert into iris_staging.water_protection_zones"),
     ):
         command = sub.add_parser(name, help=help_text)
-        command.add_argument("--source-file", type=Path, help="process a saved GetFeature response instead of the live WFS")
+        command.add_argument(
+            "--source-file", type=Path, help="process a saved GetFeature response instead of the live WFS"
+        )
         command.add_argument(
             "--default-srs",
             help="CRS for --source-file geometries without srsName (e.g. urn:ogc:def:crs:EPSG::25832)",
@@ -132,7 +134,9 @@ def _policy(settings: WfsSettings) -> GeometryPolicy:
     )
 
 
-def _snapshot_provider(args: argparse.Namespace, settings: WfsSettings, mapping: LayerMapping) -> Callable[[], SourceSnapshot]:
+def _snapshot_provider(
+    args: argparse.Namespace, settings: WfsSettings, mapping: LayerMapping
+) -> Callable[[], SourceSnapshot]:
     if args.source_file is not None:
         return lambda: retrieve_from_file(args.source_file, mapping, default_srs=args.default_srs)
     return lambda: retrieve_from_wfs(settings, mapping, _wfs_client(settings))
@@ -165,7 +169,13 @@ def cmd_inspect(args: argparse.Namespace, settings: WfsSettings, mapping: LayerM
             "implements_sorting": capabilities.implements_sorting,
             "count_default": capabilities.count_default,
             "feature_types": [
-                {"name": ft.name, "title": ft.title, "default_crs": ft.default_crs, "other_crs": list(ft.other_crs), "wgs84_bbox": ft.wgs84_bbox}
+                {
+                    "name": ft.name,
+                    "title": ft.title,
+                    "default_crs": ft.default_crs,
+                    "other_crs": list(ft.other_crs),
+                    "wgs84_bbox": ft.wgs84_bbox,
+                }
                 for ft in capabilities.feature_types
             ],
         }
@@ -253,7 +263,9 @@ def cmd_load(args: argparse.Namespace, settings: WfsSettings, mapping: LayerMapp
         engine.dispose()
 
 
-def _make_loader(engine: Engine, target: Any, batch_size: int, state_code: str) -> Callable[[ProcessingResult, IngestionReport], Any]:
+def _make_loader(
+    engine: Engine, target: Any, batch_size: int, state_code: str
+) -> Callable[[ProcessingResult, IngestionReport], Any]:
     from app.database.staging.repository import quarantine_row
     from app.database.staging.repository import staging_transaction
     from app.database.staging.repository import zone_row
@@ -313,14 +325,22 @@ def cmd_check_db() -> int:
             table = connection.execute(
                 text("SELECT to_regclass('iris_staging.water_protection_zones') IS NOT NULL")
             ).scalar_one()
-            rows = connection.execute(select(func.count()).select_from(WaterProtectionZone)).scalar_one() if table else None
+            rows = (
+                connection.execute(select(func.count()).select_from(WaterProtectionZone)).scalar_one()
+                if table
+                else None
+            )
             connection.rollback()
     except SQLAlchemyError as exc:
         logger.error("database check failed: %s", _db_error(exc))
         return EXIT_FAILED
     finally:
         engine.dispose()
-    print(json.dumps({"target": target.describe(), **info, "zones_table_exists": table, "zone_rows": rows}, indent=2, default=str))
+    print(
+        json.dumps(
+            {"target": target.describe(), **info, "zones_table_exists": table, "zone_rows": rows}, indent=2, default=str
+        )
+    )
     return EXIT_OK if table else EXIT_FAILED
 
 

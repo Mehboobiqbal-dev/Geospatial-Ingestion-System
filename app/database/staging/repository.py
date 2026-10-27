@@ -6,16 +6,18 @@ from collections.abc import Sequence
 from contextlib import contextmanager
 from datetime import datetime
 from typing import Any
+from typing import cast
 
 from geoalchemy2.shape import from_shape
 from sqlalchemy import Engine
+from sqlalchemy import Table
 from sqlalchemy import create_engine
 from sqlalchemy import func
 from sqlalchemy import select
 from sqlalchemy import update
-from sqlalchemy.dialects.postgresql import Insert
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.engine import Connection
+from sqlalchemy.sql.dml import ReturningInsert
 
 from app.database.staging.base import STAGING_SCHEMA
 from app.database.staging.guard import StagingTarget
@@ -28,9 +30,9 @@ from app.water_protection.errors import StagingTargetRefused
 from app.water_protection.records import QuarantinedFeature
 from app.water_protection.records import StagedZone
 
-zones = WaterProtectionZone.__table__
-quarantine = WaterProtectionZoneQuarantine.__table__
-runs = WaterProtectionZoneIngestionRun.__table__
+zones = cast(Table, WaterProtectionZone.__table__)
+quarantine = cast(Table, WaterProtectionZoneQuarantine.__table__)
+runs = cast(Table, WaterProtectionZoneIngestionRun.__table__)
 
 # Serialises concurrent loads of the zone table (transaction-scoped lock).
 LOAD_LOCK_KEY = zlib.crc32(b"iris_staging.water_protection_zones")
@@ -155,7 +157,7 @@ def quarantine_row(item: QuarantinedFeature, run_id: uuid.UUID, seen_at: datetim
     }
 
 
-def build_zone_upsert(rows: Sequence[dict[str, Any]]) -> Insert:
+def build_zone_upsert(rows: Sequence[dict[str, Any]]) -> ReturningInsert[Any]:
     statement = pg_insert(zones).values(list(rows))
     excluded = statement.excluded
     changes: dict[str, Any] = {name: excluded[name] for name in ZONE_CONTENT_COLUMNS}
@@ -169,7 +171,7 @@ def build_zone_upsert(rows: Sequence[dict[str, Any]]) -> Insert:
     ).returning(zones.c.source_zone_id)
 
 
-def build_quarantine_upsert(rows: Sequence[dict[str, Any]]) -> Insert:
+def build_quarantine_upsert(rows: Sequence[dict[str, Any]]) -> ReturningInsert[Any]:
     statement = pg_insert(quarantine).values(list(rows))
     excluded = statement.excluded
     return statement.on_conflict_do_update(
@@ -201,9 +203,7 @@ class WaterProtectionZoneRepository:
         self.connection.execute(select(func.pg_advisory_xact_lock(LOAD_LOCK_KEY)))
 
     def source_ids(self, state_code: str) -> set[str]:
-        result = self.connection.execute(
-            select(zones.c.source_zone_id).where(zones.c.state_code == state_code)
-        )
+        result = self.connection.execute(select(zones.c.source_zone_id).where(zones.c.state_code == state_code))
         return set(result.scalars())
 
     def content_hashes(self, state_code: str, source_ids: Sequence[str]) -> dict[str, str]:

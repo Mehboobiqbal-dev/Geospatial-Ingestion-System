@@ -155,9 +155,7 @@ def _repair(
 
     original_area = float(geom.area)
     repaired_area = float(polygonal.area) if polygonal is not None else 0.0
-    change = (
-        abs(repaired_area - original_area) / original_area if original_area > 0 else float("inf")
-    )
+    change = abs(repaired_area - original_area) / original_area if original_area > 0 else float("inf")
     evidence: dict[str, Any] = {
         "invalid_reason": reason,
         "method": REPAIR_METHOD,

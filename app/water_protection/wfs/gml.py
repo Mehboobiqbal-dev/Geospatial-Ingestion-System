@@ -15,7 +15,6 @@ handled in ``app.water_protection.crs``.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from dataclasses import field
 
 from lxml import etree
 from shapely.geometry import LinearRing
@@ -71,7 +70,6 @@ class FeaturePage:
     number_returned: int | None
     time_stamp: str | None
     collection_srs: str | None = None
-    warnings: tuple[str, ...] = field(default_factory=tuple)
 
 
 # ==========================================================
@@ -97,15 +95,10 @@ def parse_feature_collection(
     feature_elements: list[etree._Element] = []
     for member in child_elements(root):
         name = local_name(member)
-        if name in ("member", "featureMember"):
+        if name in ("member", "featureMember", "featureMembers"):
             feature_elements.extend(child_elements(member))
-        elif name == "featureMembers":
-            feature_elements.extend(child_elements(member))
-        elif name in ("boundedBy", "additionalObjects", "truncatedResponse"):
-            if name == "truncatedResponse":
-                raise SchemaMismatchError(
-                    "server reported a truncated response", operation=operation, url=url
-                )
+        elif name == "truncatedResponse":
+            raise SchemaMismatchError("server reported a truncated response", operation=operation, url=url)
 
     features: list[RawFeature] = []
     for element in feature_elements:
@@ -221,11 +214,7 @@ def _geometry_property(prop: etree._Element) -> RawGeometry:
 
 
 def _resolve_srs(geom_el: etree._Element) -> str | None:
-    names = {
-        node.get("srsName")
-        for node in geom_el.iter()
-        if isinstance(node.tag, str) and node.get("srsName")
-    }
+    names = {node.get("srsName") for node in geom_el.iter() if isinstance(node.tag, str) and node.get("srsName")}
     if len(names) > 1:
         raise GeometryParseError(MALFORMED, f"mixed srsName values within one geometry: {sorted(names)}")  # type: ignore[type-var]
     return names.pop() if names else None
@@ -233,9 +222,7 @@ def _resolve_srs(geom_el: etree._Element) -> str | None:
 
 def _srs_dimension(geom_el: etree._Element) -> int:
     dims = {
-        node.get("srsDimension")
-        for node in geom_el.iter()
-        if isinstance(node.tag, str) and node.get("srsDimension")
+        node.get("srsDimension") for node in geom_el.iter() if isinstance(node.tag, str) and node.get("srsDimension")
     }
     if not dims:
         return 2
@@ -269,23 +256,16 @@ def parse_geometry(element: etree._Element, dimension: int = 2) -> BaseGeometry:
 def _multi_surface(element: etree._Element, dimension: int) -> MultiPolygon:
     polygons: list[Polygon] = []
     for member in child_elements(element):
-        member_name = local_name(member)
-        if member_name in ("surfaceMember", "polygonMember"):
-            parts = list(child_elements(member))
-        elif member_name == "surfaceMembers":
-            parts = list(child_elements(member))
-        else:
+        if local_name(member) not in ("surfaceMember", "surfaceMembers", "polygonMember"):
             continue
-        for part in parts:
+        for part in child_elements(member):
             part_geom = parse_geometry(part, dimension)
             if isinstance(part_geom, Polygon):
                 polygons.append(part_geom)
             elif isinstance(part_geom, MultiPolygon):
                 polygons.extend(part_geom.geoms)
             else:
-                raise GeometryParseError(
-                    UNSUPPORTED, f"MultiSurface member <{local_name(part)}> is not a surface"
-                )
+                raise GeometryParseError(UNSUPPORTED, f"MultiSurface member <{local_name(part)}> is not a surface")
     if not polygons:
         raise GeometryParseError(MALFORMED, "MultiSurface without members")
     return MultiPolygon(polygons)
@@ -343,9 +323,7 @@ def _coordinates_of(element: etree._Element, dimension: int, *, minimum: int) ->
         dim = int(pos_list.get("srsDimension") or dimension)
         values = _floats((pos_list.text or "").split())
         if len(values) % dim:
-            raise GeometryParseError(
-                MALFORMED, f"posList has {len(values)} values, not a multiple of dimension {dim}"
-            )
+            raise GeometryParseError(MALFORMED, f"posList has {len(values)} values, not a multiple of dimension {dim}")
         coords = [(values[i], values[i + 1]) for i in range(0, len(values), dim)]
     else:
         positions = children(element, "pos")

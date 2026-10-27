@@ -126,7 +126,11 @@ def exception_info(root: etree._Element) -> OwsExceptionInfo | None:
     if local_name(root) not in _EXCEPTION_ROOTS:
         return None
     exceptions = [
-        node for node in root.iter() if isinstance(node.tag, str) and local_name(node) in (
+        node
+        for node in root.iter()
+        if isinstance(node.tag, str)
+        and local_name(node)
+        in (
             "Exception",
             "ServiceException",
         )
@@ -134,11 +138,11 @@ def exception_info(root: etree._Element) -> OwsExceptionInfo | None:
     if not exceptions:
         return OwsExceptionInfo(code=None, locator=None, text="(empty exception report)")
     first = exceptions[0]
-    texts = [t.strip() for t in first.itertext() if t.strip()]
+    texts = [str(t).strip() for t in first.itertext()]
     return OwsExceptionInfo(
         code=first.get("exceptionCode") or first.get("code"),
         locator=first.get("locator"),
-        text=" ".join(texts)[:2000] or "(no exception text)",
+        text=" ".join(t for t in texts if t)[:2000] or "(no exception text)",
     )
 
 
@@ -187,9 +191,7 @@ def parse_xml_response(
     try:
         root = etree.fromstring(content, _parser())
     except etree.XMLSyntaxError as exc:
-        raise UnexpectedContentError(
-            f"response is not well-formed XML: {exc}", operation=operation, url=url
-        ) from exc
+        raise UnexpectedContentError(f"response is not well-formed XML: {exc}", operation=operation, url=url) from exc
 
     info = exception_info(root)
     if info is not None:
@@ -204,8 +206,7 @@ def parse_xml_response(
 
     if local_name(root) not in expected_roots:
         raise UnexpectedContentError(
-            f"unexpected root element <{local_name(root)}>; expected one of "
-            f"{sorted(expected_roots)}",
+            f"unexpected root element <{local_name(root)}>; expected one of {sorted(expected_roots)}",
             operation=operation,
             url=url,
         )

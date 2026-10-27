@@ -69,6 +69,7 @@ select = ["E", "F", "W", "I", "B", "UP", "SIM"]
 
 [tool.ruff.lint.isort]
 force-single-line = true
+known-third-party = ["alembic"]
 
 [tool.mypy]
 python_version = "3.12"

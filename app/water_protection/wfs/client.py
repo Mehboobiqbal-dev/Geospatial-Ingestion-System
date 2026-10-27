@@ -225,9 +225,7 @@ class WfsClient:
             params[self._count_param(plan)] = str(max_features + 1)
             page = self._get_page(plan, params, geometry_property, "GetFeature")
             if len(page.features) > max_features:
-                raise RetrievalLimitExceeded(
-                    f"more than {max_features} features returned", operation="GetFeature"
-                )
+                raise RetrievalLimitExceeded(f"more than {max_features} features returned", operation="GetFeature")
             yield page
             return
 
@@ -254,9 +252,7 @@ class WfsClient:
             yield page
             start += returned
             if start > max_features:
-                raise RetrievalLimitExceeded(
-                    f"more than {max_features} features retrieved", operation=operation
-                )
+                raise RetrievalLimitExceeded(f"more than {max_features} features retrieved", operation=operation)
             if returned == 0:
                 return
             if total is not None and start >= total:

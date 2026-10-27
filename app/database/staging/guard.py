@@ -46,20 +46,19 @@ class StagingTarget:
 
     def describe(self) -> str:
         """Human-readable target without credentials."""
-        return f"{self.url.drivername}://{self.host or 'local-socket'}:{self.url.port or 5432}/{self.database} schema={self.schema} env={self.environment}"
+        location = f"{self.host or 'local-socket'}:{self.url.port or 5432}/{self.database}"
+        return f"{self.url.drivername}://{location} schema={self.schema} env={self.environment}"
 
 
 def validate_staging_target(settings: StagingDatabaseSettings) -> StagingTarget:
     environment = (settings.environment or "").strip().lower()
     if not environment:
         raise StagingTargetRefused(
-            "IRIS_ENVIRONMENT is not set; set it to one of "
-            f"{sorted(ALLOWED_ENVIRONMENTS)} for staging writes"
+            f"IRIS_ENVIRONMENT is not set; set it to one of {sorted(ALLOWED_ENVIRONMENTS)} for staging writes"
         )
     if environment not in ALLOWED_ENVIRONMENTS:
         raise StagingTargetRefused(
-            f"IRIS_ENVIRONMENT={environment!r} is not allowed to write; "
-            f"allowed: {sorted(ALLOWED_ENVIRONMENTS)}"
+            f"IRIS_ENVIRONMENT={environment!r} is not allowed to write; allowed: {sorted(ALLOWED_ENVIRONMENTS)}"
         )
 
     schema = settings.schema_name.strip()
@@ -101,14 +100,18 @@ def validate_staging_target(settings: StagingDatabaseSettings) -> StagingTarget:
 def verify_connection(connection: Connection, target: StagingTarget) -> dict[str, Any]:
     """Server-side re-check of the target; run inside the write transaction."""
 
-    row = connection.execute(
-        text(
-            "SELECT current_database() AS database, current_user AS db_user, "
-            "(SELECT extversion FROM pg_extension WHERE extname = 'postgis') AS postgis, "
-            "to_regnamespace(:schema) IS NOT NULL AS schema_exists"
-        ),
-        {"schema": target.schema},
-    ).mappings().one()
+    row = (
+        connection.execute(
+            text(
+                "SELECT current_database() AS database, current_user AS db_user, "
+                "(SELECT extversion FROM pg_extension WHERE extname = 'postgis') AS postgis, "
+                "to_regnamespace(:schema) IS NOT NULL AS schema_exists"
+            ),
+            {"schema": target.schema},
+        )
+        .mappings()
+        .one()
+    )
 
     if row["database"] != target.database:
         raise StagingTargetRefused(
@@ -119,7 +122,5 @@ def verify_connection(connection: Connection, target: StagingTarget) -> dict[str
     if row["postgis"] is None:
         raise PersistenceError("PostGIS extension is not installed in the staging database")
     if not row["schema_exists"]:
-        raise PersistenceError(
-            f"schema {target.schema!r} does not exist; run 'python -m app.water_protection init-db'"
-        )
+        raise PersistenceError(f"schema {target.schema!r} does not exist; run 'python -m app.water_protection init-db'")
     return dict(row)

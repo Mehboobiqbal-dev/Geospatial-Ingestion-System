@@ -14,7 +14,6 @@ The staging database deliberately uses its own variable
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Literal
 
 from pydantic import Field
 from pydantic import SecretStr
@@ -92,9 +91,7 @@ class WfsSettings(BaseSettings):
         requested = tuple(v.strip() for v in self.accept_versions.split(",") if v.strip())
         unsupported = [v for v in requested if v not in SUPPORTED_WFS_VERSIONS]
         if unsupported or not requested:
-            raise ValueError(
-                f"Unsupported WFS version(s) {unsupported}; supported: {SUPPORTED_WFS_VERSIONS}"
-            )
+            raise ValueError(f"Unsupported WFS version(s) {unsupported}; supported: {SUPPORTED_WFS_VERSIONS}")
         return requested
 
 
@@ -145,6 +142,3 @@ class StagingDatabaseSettings(BaseSettings):
         if not self.allowed_hosts:
             return None
         return frozenset(h.strip().lower() for h in self.allowed_hosts.split(",") if h.strip())
-
-
-LogFormat = Literal["text", "json"]

@@ -51,17 +51,13 @@ def run_migrations_online() -> None:
 
     with engine.connect() as connection:
         database, postgis = connection.execute(
-            text(
-                "SELECT current_database(), "
-                "(SELECT extversion FROM pg_extension WHERE extname = 'postgis')"
-            )
+            text("SELECT current_database(), (SELECT extversion FROM pg_extension WHERE extname = 'postgis')")
         ).one()
         if database != target.database:
             raise StagingTargetRefused(f"connected to {database!r}, expected {target.database!r}")
         if postgis is None:
             raise RuntimeError(
-                "PostGIS is not installed in the staging database; "
-                "a superuser must run CREATE EXTENSION postgis first"
+                "PostGIS is not installed in the staging database; a superuser must run CREATE EXTENSION postgis first"
             )
         # The version table lives in iris_staging, so the schema must exist
         # before Alembic creates it. Checked first because even

@@ -36,9 +36,7 @@ GEOMETRY_PROPERTY_TYPES = frozenset(
         "MultiPointPropertyType",
     }
 )
-NUMERIC_XSD_TYPES = frozenset(
-    {"decimal", "double", "float", "int", "integer", "long", "short", "nonNegativeInteger"}
-)
+NUMERIC_XSD_TYPES = frozenset({"decimal", "double", "float", "int", "integer", "long", "short", "nonNegativeInteger"})
 
 
 @dataclass(frozen=True)
@@ -182,16 +180,12 @@ def check_schema_against_mapping(
     if geometry is None:
         problems.append(f"geometry property {geometry_property!r} is not in the layer schema")
     elif not geometry.is_geometry:
-        problems.append(
-            f"geometry property {geometry_property!r} has non-geometry type {geometry.type_label}"
-        )
+        problems.append(f"geometry property {geometry_property!r} has non-geometry type {geometry.type_label}")
 
     if problems:
         available = ", ".join(f"{p.name}:{p.type_label}" for p in schema.properties)
         raise SchemaMismatchError(
-            "mapping does not match the live schema: "
-            + "; ".join(problems)
-            + f". Available properties: {available}",
+            "mapping does not match the live schema: " + "; ".join(problems) + f". Available properties: {available}",
             operation="DescribeFeatureType",
         )
 

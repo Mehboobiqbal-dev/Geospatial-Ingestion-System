@@ -128,9 +128,7 @@ class WfsHttpClient:
             self._throttle()
             retry_after: float | None = None
             try:
-                status, content, content_type, headers = self._fetch(
-                    base_url, params, operation=operation, url=url
-                )
+                status, content, content_type, headers = self._fetch(base_url, params, operation=operation, url=url)
             except (requests.Timeout, requests.ConnectionError) as exc:
                 failure = f"{type(exc).__name__}: {exc}"
                 if attempt == attempts:

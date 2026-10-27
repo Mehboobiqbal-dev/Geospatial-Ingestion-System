@@ -311,9 +311,7 @@ def run_ingestion(
         "verification_note": mapping.verification_note,
     }
     if not mapping.schema_verified:
-        report.notes.append(
-            "Mapping is not verified against the live schema; source property names are assumptions."
-        )
+        report.notes.append("Mapping is not verified against the live schema; source property names are assumptions.")
 
     if mode == "load" and not mapping.schema_verified and not allow_unverified_mapping:
         report.fail(
