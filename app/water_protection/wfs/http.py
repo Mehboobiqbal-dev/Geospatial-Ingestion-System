@@ -67,7 +67,7 @@ def redact_url(url: str) -> str:
             (k, "***" if k.lower() in _SENSITIVE_PARAMS else v)
             for k, v in parse_qsl(parts.query, keep_blank_values=True)
         ],
-        safe=":/,",
+        safe=":/,*",
     )
     return urlunsplit((parts.scheme, netloc, parts.path, query, ""))
 

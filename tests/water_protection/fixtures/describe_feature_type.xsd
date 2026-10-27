@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SYNTHETIC FIXTURE: DescribeFeatureType for th_wsg_zonen; property names are the unverified mapping assumptions. -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:gml="http://www.opengis.net/gml/3.2"
+    xmlns:wsg="https://example.invalid/wsg"
+    targetNamespace="https://example.invalid/wsg"
+    elementFormDefault="qualified">
+  <xsd:import namespace="http://www.opengis.net/gml/3.2" schemaLocation="http://schemas.opengis.net/gml/3.2.1/gml.xsd"/>
+  <xsd:complexType name="th_wsg_zonenType">
+    <xsd:complexContent>
+      <xsd:extension base="gml:AbstractFeatureType">
+        <xsd:sequence>
+          <xsd:element name="zone_id" type="xsd:string" minOccurs="0" nillable="true"/>
+          <xsd:element name="wsg_nr" type="xsd:string" minOccurs="0" nillable="true"/>
+          <xsd:element name="wsg_name" type="xsd:string" minOccurs="0" nillable="true"/>
+          <xsd:element name="zone" minOccurs="0" nillable="true">
+            <xsd:simpleType>
+              <xsd:restriction base="xsd:string">
+                <xsd:maxLength value="10"/>
+              </xsd:restriction>
+            </xsd:simpleType>
+          </xsd:element>
+          <xsd:element name="zone_bez" type="xsd:string" minOccurs="0" nillable="true"/>
+          <xsd:element name="status" type="xsd:string" minOccurs="0" nillable="true"/>
+          <xsd:element name="rechtsgrundlage" type="xsd:string" minOccurs="0" nillable="true"/>
+          <xsd:element name="datum_festsetzung" type="xsd:date" minOccurs="0" nillable="true"/>
+          <xsd:element name="aenderungsdatum" type="xsd:date" minOccurs="0" nillable="true"/>
+          <xsd:element name="bemerkung" type="xsd:string" minOccurs="0" nillable="true"/>
+          <xsd:element name="geom" type="gml:MultiSurfacePropertyType" minOccurs="0" nillable="true"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:element name="th_wsg_zonen" type="wsg:th_wsg_zonenType" substitutionGroup="gml:AbstractFeature"/>
+</xsd:schema>

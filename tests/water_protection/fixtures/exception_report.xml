@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SYNTHETIC FIXTURE: OWS 1.1 exception report as returned by WFS 2.0 servers. -->
+<ows:ExceptionReport xmlns:ows="http://www.opengis.net/ows/1.1" version="2.0.0">
+  <ows:Exception exceptionCode="InvalidParameterValue" locator="typeNames">
+    <ows:ExceptionText>Feature type wsg:th_wsg_zonen unknown</ows:ExceptionText>
+  </ows:Exception>
+</ows:ExceptionReport>

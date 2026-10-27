@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SYNTHETIC FIXTURE: structure of a WFS 1.1.0 GetCapabilities response; not retrieved from the live service. -->
+<wfs:WFS_Capabilities version="1.1.0"
+    xmlns:wfs="http://www.opengis.net/wfs"
+    xmlns:ows="http://www.opengis.net/ows"
+    xmlns:ogc="http://www.opengis.net/ogc"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    xmlns:wsg="https://example.invalid/wsg">
+  <ows:ServiceIdentification>
+    <ows:Title>Wasserschutzgebiete Thueringen (synthetic fixture, WFS 1.1.0)</ows:Title>
+    <ows:ServiceType>WFS</ows:ServiceType>
+    <ows:ServiceTypeVersion>1.1.0</ows:ServiceTypeVersion>
+  </ows:ServiceIdentification>
+  <ows:OperationsMetadata>
+    <ows:Operation name="GetCapabilities"/>
+    <ows:Operation name="DescribeFeatureType"/>
+    <ows:Operation name="GetFeature">
+      <ows:Parameter name="outputFormat">
+        <ows:Value>text/xml; subtype=gml/3.1.1</ows:Value>
+      </ows:Parameter>
+      <ows:Parameter name="resultType">
+        <ows:Value>results</ows:Value>
+        <ows:Value>hits</ows:Value>
+      </ows:Parameter>
+    </ows:Operation>
+  </ows:OperationsMetadata>
+  <wfs:FeatureTypeList>
+    <wfs:FeatureType>
+      <wfs:Name>wsg:th_wsg_zonen</wfs:Name>
+      <wfs:Title>Wasserschutzgebietszonen (synthetic)</wfs:Title>
+      <wfs:DefaultSRS>urn:ogc:def:crs:EPSG::25832</wfs:DefaultSRS>
+      <wfs:OutputFormats>
+        <wfs:Format>text/xml; subtype=gml/3.1.1</wfs:Format>
+      </wfs:OutputFormats>
+    </wfs:FeatureType>
+  </wfs:FeatureTypeList>
+</wfs:WFS_Capabilities>

@@ -124,7 +124,9 @@ class WaterProtectionZone(StagingBase):
     source_srs_name: Mapped[str] = mapped_column(Text, comment="srsName exactly as in the response")
     crs_transformation: Mapped[str] = mapped_column(Text, comment="PROJ operation used, or none")
     geometry_repaired: Mapped[bool] = mapped_column(Boolean, server_default="false")
-    geometry_repair_evidence: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
+    # none_as_null: Python None must become SQL NULL, not the JSON value null,
+    # or the repair_evidence_present check cannot tell repaired rows apart.
+    geometry_repair_evidence: Mapped[dict[str, Any] | None] = mapped_column(JSONB(none_as_null=True))
 
     # Validation
     validation_status: Mapped[str] = mapped_column(Text)
@@ -172,7 +174,7 @@ class WaterProtectionZoneQuarantine(StagingBase):
     record_key_kind: Mapped[str] = mapped_column(Text)
     reason_code: Mapped[str] = mapped_column(Text)
     reason_detail: Mapped[str] = mapped_column(Text)
-    evidence: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
+    evidence: Mapped[dict[str, Any] | None] = mapped_column(JSONB(none_as_null=True))
     source_zone_id: Mapped[str | None] = mapped_column(Text)
     source_feature_gml_id: Mapped[str | None] = mapped_column(Text)
     source_attributes: Mapped[dict[str, Any]] = mapped_column(JSONB)

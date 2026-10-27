@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SYNTHETIC FIXTURE: structure of a WFS 2.0.0 GetCapabilities response; not retrieved from the live service. -->
+<wfs:WFS_Capabilities version="2.0.0"
+    xmlns:wfs="http://www.opengis.net/wfs/2.0"
+    xmlns:ows="http://www.opengis.net/ows/1.1"
+    xmlns:fes="http://www.opengis.net/fes/2.0"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    xmlns:wsg="https://example.invalid/wsg">
+  <ows:ServiceIdentification>
+    <ows:Title>Wasserschutzgebiete Thueringen (synthetic fixture)</ows:Title>
+    <ows:ServiceType>WFS</ows:ServiceType>
+    <ows:ServiceTypeVersion>2.0.0</ows:ServiceTypeVersion>
+    <ows:ServiceTypeVersion>1.1.0</ows:ServiceTypeVersion>
+  </ows:ServiceIdentification>
+  <ows:ServiceProvider>
+    <ows:ProviderName>Synthetic test provider</ows:ProviderName>
+  </ows:ServiceProvider>
+  <ows:OperationsMetadata>
+    <ows:Operation name="GetCapabilities">
+      <ows:DCP><ows:HTTP><ows:Get xlink:href="https://wfs.test/wsg?"/></ows:HTTP></ows:DCP>
+    </ows:Operation>
+    <ows:Operation name="DescribeFeatureType">
+      <ows:DCP><ows:HTTP><ows:Get xlink:href="https://wfs.test/wsg?"/></ows:HTTP></ows:DCP>
+    </ows:Operation>
+    <ows:Operation name="GetFeature">
+      <ows:DCP><ows:HTTP><ows:Get xlink:href="https://wfs.test/wsg?"/></ows:HTTP></ows:DCP>
+      <ows:Parameter name="outputFormat">
+        <ows:AllowedValues>
+          <ows:Value>application/gml+xml; version=3.2</ows:Value>
+          <ows:Value>text/xml; subtype=gml/3.1.1</ows:Value>
+          <ows:Value>application/json</ows:Value>
+        </ows:AllowedValues>
+      </ows:Parameter>
+      <ows:Parameter name="resultType">
+        <ows:AllowedValues>
+          <ows:Value>results</ows:Value>
+          <ows:Value>hits</ows:Value>
+        </ows:AllowedValues>
+      </ows:Parameter>
+    </ows:Operation>
+    <ows:Constraint name="ImplementsBasicWFS"><ows:NoValues/><ows:DefaultValue>TRUE</ows:DefaultValue></ows:Constraint>
+    <ows:Constraint name="ImplementsResultPaging"><ows:NoValues/><ows:DefaultValue>TRUE</ows:DefaultValue></ows:Constraint>
+    <ows:Constraint name="CountDefault"><ows:NoValues/><ows:DefaultValue>1000</ows:DefaultValue></ows:Constraint>
+  </ows:OperationsMetadata>
+  <wfs:FeatureTypeList>
+    <wfs:FeatureType>
+      <wfs:Name>wsg:th_wsg_zonen</wfs:Name>
+      <wfs:Title>Wasserschutzgebietszonen (synthetic)</wfs:Title>
+      <wfs:DefaultCRS>urn:ogc:def:crs:EPSG::25832</wfs:DefaultCRS>
+      <wfs:OtherCRS>urn:ogc:def:crs:EPSG::4326</wfs:OtherCRS>
+      <wfs:OtherCRS>urn:ogc:def:crs:EPSG::31468</wfs:OtherCRS>
+      <ows:WGS84BoundingBox>
+        <ows:LowerCorner>9.87 50.20</ows:LowerCorner>
+        <ows:UpperCorner>12.65 51.65</ows:UpperCorner>
+      </ows:WGS84BoundingBox>
+    </wfs:FeatureType>
+    <wfs:FeatureType>
+      <wfs:Name>wsg:th_wsg_gebiete</wfs:Name>
+      <wfs:Title>Wasserschutzgebiete (synthetic)</wfs:Title>
+      <wfs:DefaultCRS>urn:ogc:def:crs:EPSG::25832</wfs:DefaultCRS>
+    </wfs:FeatureType>
+  </wfs:FeatureTypeList>
+  <fes:Filter_Capabilities>
+    <fes:Conformance>
+      <fes:Constraint name="ImplementsQuery"><ows:NoValues/><ows:DefaultValue>TRUE</ows:DefaultValue></fes:Constraint>
+      <fes:Constraint name="ImplementsSorting"><ows:NoValues/><ows:DefaultValue>TRUE</ows:DefaultValue></fes:Constraint>
+    </fes:Conformance>
+  </fes:Filter_Capabilities>
+</wfs:WFS_Capabilities>
