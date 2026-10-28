@@ -215,6 +215,28 @@ def test_recorded_live_excerpt_loads_with_every_category(
     assert rows["482991001"] == "HQSG_QUANT_A "
 
 
+def test_renumbering_at_the_source_is_reported_not_overwritten(
+    engine: Engine, target: StagingTarget, mapping: LayerMapping
+) -> None:
+    snapshot = retrieve_from_file(FIXTURES / "live_getfeature_excerpt.xml", mapping, default_srs=None)
+    load(engine, target, process_snapshot(snapshot, mapping, GeometryPolicy(), IngestionReport(mode="load")))
+    features = tuple(
+        replace(f, properties={**f.properties, "Sz_Num": "5.53510099E8"})
+        if f.properties.get("Sz_Num") == "5.53510025E8"
+        else f
+        for f in snapshot.features
+    )
+    renumbered = process_snapshot(
+        replace(snapshot, features=features), mapping, GeometryPolicy(), IngestionReport(mode="load")
+    )
+
+    summary = load(engine, target, renumbered)
+
+    assert (summary.inserted, summary.unchanged, summary.absent_from_source) == (1, 10, ["553510025"])
+    assert summary.possible_renumbering == [("553510025", "553510099")]
+    assert scalar(engine, "SELECT count(*) FROM iris_staging.water_protection_zones") == 12
+
+
 def test_database_constraints_reject_inconsistent_rows(
     engine: Engine, target: StagingTarget, processed: ProcessingResult
 ) -> None:

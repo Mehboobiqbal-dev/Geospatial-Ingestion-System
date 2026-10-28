@@ -89,6 +89,18 @@ class InMemoryStaging:
             self.quarantine[key] = row
         return len(rows)
 
+    def matching_geometries(
+        self, state_code: str, old_ids: Sequence[str], new_ids: Sequence[str], max_area_difference: float
+    ) -> list[tuple[str, str]]:
+        pairs = []
+        for old_id in old_ids:
+            old = self.zones[(state_code, old_id)]["shape"]
+            for new_id in new_ids:
+                new = self.zones[(state_code, new_id)]["shape"]
+                if old.symmetric_difference(new).area <= max_area_difference * old.area:
+                    pairs.append((old_id, new_id))
+        return sorted(pairs)
+
 
 def zone_row(zone: StagedZone, run_id: uuid.UUID, seen_at: datetime) -> dict[str, Any]:
     return {
@@ -96,6 +108,7 @@ def zone_row(zone: StagedZone, run_id: uuid.UUID, seen_at: datetime) -> dict[str
         "source_zone_id": zone.key,
         "content_hash": zone.content_hash,
         "zone_category": zone.attributes.zone_category,
+        "shape": zone.geometry.geometry,
         "last_ingestion_run_id": run_id,
     }
 
@@ -189,6 +202,22 @@ def test_rows_missing_from_the_source_are_reported_not_deleted(processed: Proces
     assert summary.stale_after_rejection == ["990000003"]
     assert ("TH", "990000004") in db.zones  # kept for review
     assert summary.to_dict()["absent_from_source"] == 1
+    assert summary.possible_renumbering == []  # nothing new with that geometry
+
+
+def test_renumbered_zone_is_reported_with_both_numbers(processed: ProcessingResult) -> None:
+    db = InMemoryStaging()
+    load(db, processed.zones)
+
+    def renumber(zone: StagedZone) -> StagedZone:
+        return replace(zone, attributes=replace(zone.attributes, source_zone_id="990009999"))
+
+    summary = load(db, [renumber(z) if z.key == "990000003" else z for z in processed.zones])
+
+    assert (summary.inserted, summary.absent_from_source) == (1, ["990000003"])
+    assert summary.possible_renumbering == [("990000003", "990009999")]
+    assert summary.to_dict()["possible_renumbering_sample"] == [{"absent_id": "990000003", "new_id": "990009999"}]
+    assert ("TH", "990000003") in db.zones  # the old row is kept, not overwritten
 
 
 def test_duplicate_keys_in_one_batch_are_refused(processed: ProcessingResult) -> None:

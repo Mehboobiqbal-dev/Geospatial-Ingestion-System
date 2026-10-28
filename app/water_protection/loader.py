@@ -28,6 +28,11 @@ from app.water_protection.records import StagedZone
 
 logger = logging.getLogger(__name__)
 
+# A zone that disappears while a new one with (nearly) the same geometry
+# appears was most likely renumbered at the source. Up to 1 % of the old
+# area may differ, to allow for a re-digitised boundary.
+RENUMBERING_MAX_AREA_DIFFERENCE = 0.01
+
 
 class StagingRepository(Protocol):
     def acquire_load_lock(self) -> None: ...
@@ -36,6 +41,9 @@ class StagingRepository(Protocol):
     def upsert_zones(self, rows: Sequence[dict[str, Any]]) -> int: ...
     def mark_seen(self, state_code: str, source_ids: Sequence[str], seen_at: datetime, run_id: uuid.UUID) -> int: ...
     def upsert_quarantine(self, rows: Sequence[dict[str, Any]]) -> int: ...
+    def matching_geometries(
+        self, state_code: str, old_ids: Sequence[str], new_ids: Sequence[str], max_area_difference: float
+    ) -> list[tuple[str, str]]: ...
 
 
 Transaction = Callable[[], AbstractContextManager[StagingRepository]]
@@ -62,6 +70,7 @@ class LoadSummary:
     batches: int = 0
     absent_from_source: list[str] = field(default_factory=list)
     stale_after_rejection: list[str] = field(default_factory=list)
+    possible_renumbering: list[tuple[str, str]] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -74,6 +83,10 @@ class LoadSummary:
             "absent_from_source_sample": sorted(self.absent_from_source)[:50],
             "stale_after_rejection": len(self.stale_after_rejection),
             "stale_after_rejection_sample": sorted(self.stale_after_rejection)[:50],
+            "possible_renumbering": len(self.possible_renumbering),
+            "possible_renumbering_sample": [
+                {"absent_id": old, "new_id": new} for old, new in sorted(self.possible_renumbering)[:50]
+            ],
         }
 
 
@@ -114,6 +127,7 @@ def load_into_staging(
     quarantine_row: RowBuilder,
 ) -> LoadSummary:
     summary = LoadSummary()
+    inserted_ids: list[str] = []
 
     with transaction() as repo:
         repo.acquire_load_lock()
@@ -134,6 +148,7 @@ def load_into_staging(
                     f"batch {summary.batches}: expected {len(plan.unchanged)} unchanged rows, found {touched}"
                 )
 
+            inserted_ids.extend(z.key for z in plan.inserts)
             summary.inserted += len(plan.inserts)
             summary.updated += len(plan.updates)
             summary.unchanged += len(plan.unchanged)
@@ -152,10 +167,19 @@ def load_into_staging(
                 [quarantine_row(item, run_id, seen_at) for item in quarantined]
             )
 
-    # Nothing is deleted. Rows missing from the source, or whose source
-    # feature was rejected this run, are reported for review instead.
-    accepted_ids = {z.key for z in zones}
-    rejected_ids = {q.source_zone_id for q in quarantined if q.source_zone_id}
-    summary.absent_from_source = sorted(existing_ids - accepted_ids - rejected_ids)
-    summary.stale_after_rejection = sorted(existing_ids & (rejected_ids - accepted_ids))
+        # Nothing is deleted. Rows missing from the source, or whose source
+        # feature was rejected this run, are reported for review instead.
+        accepted_ids = {z.key for z in zones}
+        rejected_ids = {q.source_zone_id for q in quarantined if q.source_zone_id}
+        summary.absent_from_source = sorted(existing_ids - accepted_ids - rejected_ids)
+        summary.stale_after_rejection = sorted(existing_ids & (rejected_ids - accepted_ids))
+        if summary.absent_from_source and inserted_ids:
+            summary.possible_renumbering = repo.matching_geometries(
+                state_code, summary.absent_from_source, inserted_ids, RENUMBERING_MAX_AREA_DIFFERENCE
+            )
+            if summary.possible_renumbering:
+                logger.warning(
+                    "zones absent from the source match newly inserted zones; the source may have renumbered them",
+                    extra={"pairs": len(summary.possible_renumbering)},
+                )
     return summary

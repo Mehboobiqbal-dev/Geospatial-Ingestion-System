@@ -34,6 +34,7 @@ CC BY 4.0, "Es gelten keine Zugriffsbeschränkungen") and its WFS (record
 | `inspect` with the first mapping (assumed names) | all 9 assumed property names reported missing: the schema check works, and the assumptions were wrong |
 | Attribute download of all features | 3 090 features, values profiled (section 2) |
 | `validate` / `load` with the verified mapping | 3 090 retrieved, 3 090 accepted, 0 rejected, 1 repaired, 89 multipart; ~12 MB in one request |
+| Publisher's open-data download `wsg_hqsg.zip` (shapefile, Last-Modified 2026-10-13) | 3 090 features; same zone numbers and the same geometry for all 3 090 (section 2) |
 
 The mapping was rebuilt from this evidence and is marked
 `schema_verified = true`. The service is the configured default; the
@@ -47,7 +48,7 @@ Profile of all 3 090 features (Stand 2026-10-13):
 
 | Property | Finding | Consequence |
 |---|---|---|
-| `Sz_Num` | `xsd:double`, written `5.53210009E8`; unique (3 090 distinct); 5th digit always matches the zone code | zone key, stored as `553210009`; non-whole values are rejected |
+| `Sz_Num` | `xsd:double` in the WFS, written `5.53210009E8`; unique (3 090 distinct); a structured zone number (below) | zone key, stored as `553210009`; non-whole values are rejected |
 | `Gebiet_Nr` | unique as well; equals `gml:name` | kept in `source_attributes` |
 | `gml:id` | `ID_WSG_HQSG.<n>`, a row counter of the response | not used as a key |
 | `Zone` | 14 codes: I 1 469, II 948, III 600, QUAL I 24, IIIA 14, IIIB 13, QUAL II 5, QUAL III 5, QUANT A 3, QUANT B 3, IIA 2, IIB 2, IIC 1, IIIC 1 | every code is in the classification table; 0 `UNKNOWN` |
@@ -59,6 +60,24 @@ Profile of all 3 090 features (Stand 2026-10-13):
 | `Herkunft` | empty for all features | nothing to map |
 | Extraction rate, restriction category, ordinance reference, designation date | not published | NULL with explicit status; never derived |
 | Geometry | 3 001 Polygon, 89 MultiSurface, all EPSG:25832, inside the expected extent | no transformation needed |
+
+**Zone key.** `Sz_Num` is the authority's zone number, not a number made up
+per export:
+
+| Check over all 3 090 zones | Result |
+|---|---|
+| Digits 1-4 name a TK25 map sheet the zone touches | 3 041; the other 49 name the neighbouring sheet |
+| Digit 5 matches the zone type (1 = I, 2 = II, 3 = III, 6-8 = QUAL I-III, 9 = QUANT) | 3 090 |
+| Digit 6 matches the sub-zone (0 = none, 1-3 = A-C) | 3 090 |
+| Same number in the publisher's shapefile, where `SZ_NUM` is a 64-bit integer | 3 090 |
+| Same geometry for that number in the shapefile (at most 1 % area difference) | 3 090 |
+
+Only one release is published at a time, so stability across future releases
+cannot be observed directly. The load protects against it: a renumbered zone
+is never overwritten, and a zone that disappears while one with the same
+geometry is inserted is reported with both numbers
+(`database.possible_renumbering`; `test_loader.py` and a PostGIS integration
+test).
 
 **Map symbols.** All 625 zones with the remark `Symbol` are zone I or QUAL I,
 and 598 of them are identical 20 m x 20 m squares (400 m²). They mark a well,
@@ -161,9 +180,6 @@ removed, area change 0.0), 990000015 (`missing_zone_code`), 990000019
 * Positional accuracy: digitised at 1:25 000 on the DTK25 (dataset lineage);
   parcel results near a boundary should be reviewed, and `boundary_contact`
   is reported separately.
-* Stability of `Sz_Num` across releases is not documented by the publisher.
-  A renumbering would appear as `absent_from_source` plus new inserts, never
-  as a silent overwrite.
 * The plausibility screen is a lon/lat box, not the Thuringia boundary.
 
 ## 8. Acceptance criteria
@@ -187,7 +203,7 @@ Additional checklist:
 | Idempotent persistence keyed by source zone ID and state code | Verified on PostGIS 3.5.2 / PostgreSQL 17 with the live data |
 | Writes guarded to the staging destination | Verified (`test_staging_guard.py`, `test_staging_sql.py`, least-privilege role) |
 | Docker, pinned dependencies, reproducible instructions | Verified: images built from exact pins, compose flow and in-container test run (section 9) |
-| No secrets or production writes | `.env` is git-ignored, `.env.example` holds placeholders only; no production target was ever configured |
+| No secrets or production writes | No credentials in any tracked file (all tracked files scanned; the pgAdmin login of the base compose file moved to `.env`); `.env` is git-ignored, `.env.example` holds placeholders only; no production target was ever configured |
 
 ## 9. Verification log
 
@@ -200,8 +216,8 @@ PostGIS 3.5.2), database `iris_staging_test`.
 | `ruff check app/water_protection app/database/staging alembic_staging/env.py tests` | All checks passed |
 | `ruff format --check ...` (same paths) | 50 files already formatted |
 | `mypy app/water_protection app/database/staging alembic_staging/env.py` | no issues in 29 source files |
-| `python -m pytest tests/water_protection` (no database) | 250 passed, integration module skipped with reason |
-| same with `IRIS_TEST_DATABASE_URL` set | 258 passed (250 + 8 PostGIS integration), 94 % line coverage of the module |
+| `python -m pytest tests/water_protection` (no database) | 251 passed, integration module skipped with reason |
+| same with `IRIS_TEST_DATABASE_URL` set | 260 passed (251 + 9 PostGIS integration), 94 % line coverage of the module |
 | `alembic -c alembic_staging.ini downgrade -1`, `upgrade head`, `current`, `check` | revision `f6c54b9016bf` reversible; head; no new upgrade operations (models = database) |
 | `python -m app.water_protection validate --export zones.gpkg` (live) | succeeded; 3 090 accepted; GeoPackage with 3 090 valid features |
 
@@ -209,6 +225,7 @@ Docker (Docker Desktop 29.9.2, Compose 5.6.1), starting from an empty volume:
 
 | Command | Result |
 |---|---|
+| `docker compose config` / `--profile wsg config` | valid, no warnings; without the profile only `postgres` and `pgadmin` |
 | `docker compose --profile wsg build wsg-ingest wsg-tests` | images `iris-wsg-th:local` and `iris-wsg-th:test` built from the pinned requirements |
 | `docker run --entrypoint id iris-wsg-th:local` | `uid=10001(iris)`: runs as non-root |
 | `docker compose --profile wsg up -d --wait postgis-staging` | init script created role, test database, PostGIS and schema; healthy |
@@ -216,7 +233,7 @@ Docker (Docker Desktop 29.9.2, Compose 5.6.1), starting from an empty volume:
 | `wsg-ingest inspect` | exit 0; mapping matches the live schema |
 | `wsg-ingest inspect` with the assignment's endpoint | exit 1, CAPTCHA page detected |
 | `wsg-ingest load` (live, twice) | exit 0; 3 090 inserted in 7 batches, then 0 inserted / 0 updated / 3 090 unchanged ([example_report.json](example_report.json)) |
-| `docker compose --profile wsg run --rm wsg-tests` | 258 passed, 0 skipped |
+| `docker compose --profile wsg run --rm wsg-tests` | 260 passed, 0 skipped |
 | `psql -f docs/wsg_th/validation_queries.sql` (read-only session) | all 12 queries as expected ([example_validation_output.txt](example_validation_output.txt)) |
 
 Defects found by running against real PostGIS, Docker and the live service,
@@ -248,5 +265,8 @@ all fixed and covered by tests:
 * A service without paging that caps its answer was only detected when a
   `hits` count was available; the single response's `numberMatched` is now
   checked as well.
+* The base `docker-compose.yml` contained a hard-coded pgAdmin login and the
+  obsolete `version` key (Compose printed a warning on every command). The
+  login now comes from `.env` and the key was removed.
 
 Data © GDI-Th, licensed under CC BY 4.0.

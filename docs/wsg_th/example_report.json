@@ -1,9 +1,9 @@
 {
-  "run_id": "c0f5cdd3-2a98-4051-9ae9-f202608032d0",
+  "run_id": "b7683c71-2abd-4a8c-ad9c-b803e95f10c6",
   "mode": "load",
   "status": "succeeded",
-  "started_at": "2026-10-28T13:56:31.536534+00:00",
-  "finished_at": "2026-10-28T13:56:47.837143+00:00",
+  "started_at": "2026-10-28T14:33:53.664971+00:00",
+  "finished_at": "2026-10-28T14:34:11.401102+00:00",
   "source": {
     "kind": "wfs",
     "endpoint": "https://www.geoproxy.geoportal-th.de/geoproxy/services/wsg_hqsg_wfs",
@@ -18,7 +18,7 @@
     "sort_by": "Sz_Num",
     "pages": 1,
     "number_matched": 3090,
-    "server_time_stamp": "2026-10-28T13:56:34Z",
+    "server_time_stamp": "2026-10-28T14:33:57Z",
     "request_url": "https://www.geoproxy.geoportal-th.de/geoproxy/services/wsg_hqsg_wfs?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=tmlnu:WASSER_UND_HEILQUELLENSCHUTZGEBIETE&NAMESPACES=xmlns%28tmlnu,http://www.geoproxy.geoportal-th.de/tmlnu%29&OUTPUTFORMAT=application/gml%2Bxml%3B+version%3D3.2&SORTBY=Sz_Num+ASC"
   },
   "mapping": {
@@ -86,7 +86,9 @@
     "absent_from_source": 0,
     "absent_from_source_sample": [],
     "stale_after_rejection": 0,
-    "stale_after_rejection_sample": []
+    "stale_after_rejection_sample": [],
+    "possible_renumbering": 0,
+    "possible_renumbering_sample": []
   },
   "error": null,
   "notes": []

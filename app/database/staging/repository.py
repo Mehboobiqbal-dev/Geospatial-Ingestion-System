@@ -241,6 +241,27 @@ class WaterProtectionZoneRepository:
             return 0
         return len(self.connection.execute(build_quarantine_upsert(rows)).all())
 
+    def matching_geometries(
+        self, state_code: str, old_ids: Sequence[str], new_ids: Sequence[str], max_area_difference: float
+    ) -> list[tuple[str, str]]:
+        """(old, new) id pairs whose geometries differ by at most the given share of the old area."""
+        old = zones.alias("old_zone")
+        new = zones.alias("new_zone")
+        statement = (
+            select(old.c.source_zone_id.label("old_id"), new.c.source_zone_id.label("new_id"))
+            .select_from(old)
+            .join(new, (new.c.state_code == old.c.state_code) & func.ST_Intersects(new.c.geom, old.c.geom))
+            .where(old.c.state_code == state_code)
+            .where(old.c.source_zone_id.in_(list(old_ids)))
+            .where(new.c.source_zone_id.in_(list(new_ids)))
+            .where(
+                func.ST_Area(func.ST_SymDifference(old.c.geom, new.c.geom))
+                <= max_area_difference * func.ST_Area(old.c.geom)
+            )
+            .order_by("old_id", "new_id")
+        )
+        return [(row.old_id, row.new_id) for row in self.connection.execute(statement)]
+
     def record_run(self, row: dict[str, Any]) -> None:
         statement = pg_insert(runs).values(row)
         statement = statement.on_conflict_do_update(

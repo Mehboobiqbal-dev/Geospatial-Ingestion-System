@@ -89,8 +89,8 @@
 11. Recent ingestion runs (including failed and empty ones)
                 run_id                |  status   | features_retrieved | features_accepted | features_rejected | rows_inserted | rows_updated | rows_unchanged | error_type |          finished_at          
 --------------------------------------+-----------+--------------------+-------------------+-------------------+---------------+--------------+----------------+------------+-------------------------------
- b91623ea-9777-46a9-8908-dba6c3cee011 | succeeded |               3090 |              3090 |                 0 |             0 |            0 |           3090 |            | 2026-10-28 13:57:04.10946+00
- c0f5cdd3-2a98-4051-9ae9-f202608032d0 | succeeded |               3090 |              3090 |                 0 |          3090 |            0 |              0 |            | 2026-10-28 13:56:47.837143+00
+ 00e24064-a878-4c9a-a446-659a00fdb15a | succeeded |               3090 |              3090 |                 0 |             0 |            0 |           3090 |            | 2026-10-28 14:34:29.068819+00
+ b7683c71-2abd-4a8c-ad9c-b803e95f10c6 | succeeded |               3090 |              3090 |                 0 |          3090 |            0 |              0 |            | 2026-10-28 14:34:11.401102+00
 (2 rows)
 
 12. Parcel screening example: a 60 m parcel on the zone II / III boundary of WSG Neustaedt

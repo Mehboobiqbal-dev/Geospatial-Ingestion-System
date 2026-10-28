@@ -14,7 +14,8 @@ permitting and groundwater-restriction screening.
 > (layer `tmlnu:WASSER_UND_HEILQUELLENSCHUTZGEBIETE`, no access restrictions,
 > CC BY 4.0). That service is the default source. Its schema and all 3 090
 > features were inspected on 2026-10-28 and the mapping is verified against
-> them. Details: [QUALITY_REPORT.md](QUALITY_REPORT.md).
+> them; the publisher's open-data download of the dataset matches it zone for
+> zone. Details: [QUALITY_REPORT.md](QUALITY_REPORT.md).
 
 ## How it works
 
@@ -100,11 +101,23 @@ explicit status, and the value is never derived from other attributes.
 | `validation_warnings` | `Bemerkung` | `geometry_is_map_symbol` when the remark is exactly `Symbol` (`[[source_flag]]`) |
 | `source_attributes` | all properties | raw, including the unmapped `Gebiet`, `Gebiet_Nr`, `Gebietsart`, `Symbolik`, `Url`, `Scale`, `Herkunft` |
 
-`Sz_Num` is the zone key: it is unique in all 3 090 features and its fifth
-digit always agrees with the zone code (1 = I, 2 = II*, 3 = III*, 6-9 =
-healing-spring zones). `gml:id` (`ID_WSG_HQSG.<n>`) is a row counter of the
-response and is not used as a key. `Gebiet_Nr` is also unique and is kept in
-`source_attributes`.
+`Sz_Num` is the zone key. It is the authority's own zone number, not an
+export artefact:
+
+* unique in all 3 090 features;
+* structured: digits 1-4 are the TK25 map sheet (for 3 041 zones a sheet the
+  zone touches, for the other 49 the neighbouring sheet), digit 5 the zone
+  type (1 = I, 2 = II, 3 = III, 6-8 = QUAL I-III, 9 = QUANT) and digit 6 the
+  sub-zone (0 = none, 1-3 = A-C), each matching `Zone` in 3 090 of 3 090 cases;
+* stored as a 64-bit integer `SZ_NUM` in the publisher's open-data shapefile
+  (`wsg_hqsg.zip`), where all 3 090 numbers and their geometries are
+  identical to the WFS.
+
+`gml:id` (`ID_WSG_HQSG.<n>`) is a row counter of the response and is not used
+as a key. `Gebiet_Nr` is also unique and is kept in `source_attributes`. If
+the source ever renumbers a zone, the load does not overwrite anything: the
+old row is reported as absent and the pair of old and new numbers is named in
+`database.possible_renumbering` (see below).
 
 Zone classification table. The codes are those listed in the dataset
 description (GeoMIS.Th `F64A2B67`); the names follow DVGW W 101. The legal
@@ -210,7 +223,10 @@ so unchanged rows are never rewritten. Counts are reconciled per batch
 (inserted / updated / unchanged must match the rows returned); any mismatch
 or error rolls the whole load back. Nothing is ever deleted: zones missing
 from the source, or whose source feature was rejected in this run, are
-reported (`absent_from_source`, `stale_after_rejection`) for review.
+reported (`absent_from_source`, `stale_after_rejection`) for review. A
+missing zone whose geometry matches a zone inserted in the same run (at most
+1 % of the area differs) is reported as `possible_renumbering` with both
+numbers.
 
 ## Safety boundary
 
@@ -270,8 +286,11 @@ docker compose --profile wsg run --rm -v "$PWD/tests/water_protection/fixtures:/
 docker compose --profile wsg stop postgis-staging         # stop; data is kept in the volume
 ```
 
-The profile keeps a plain `docker compose up` (platform PostGIS + pgAdmin)
-unchanged. The image runs as a non-root user and contains only this module.
+Without the profile, `docker compose up` still starts only the platform
+PostGIS and pgAdmin; pgAdmin's login now comes from `.env`
+(`PGADMIN_DEFAULT_EMAIL`, `PGADMIN_DEFAULT_PASSWORD`) instead of being written
+in the compose file. The image runs as a non-root user and contains only this
+module.
 
 ### Local Python
 
@@ -324,7 +343,7 @@ all 3 090 zones; the validation queries and their output on that data are in
 | `rejections_by_reason`, `rejected_samples` | why features were quarantined |
 | `warnings_by_code` | accepted with warnings (`geometry_is_map_symbol`, `geometry_repaired`, `unknown_zone_code`, ...) |
 | `transformations` | CRS operations used |
-| `database` | `inserted`, `updated`, `unchanged`, `quarantined`, `absent_from_source`, `stale_after_rejection` |
+| `database` | `inserted`, `updated`, `unchanged`, `quarantined`, `absent_from_source`, `stale_after_rejection`, `possible_renumbering` |
 | `error` | type and message of a failed run (operation names included, credentials never) |
 
 Exit codes: `0` success, `1` failure, `2` refused (configuration or safety
@@ -332,14 +351,6 @@ guard), `3` completed with rejected features.
 
 ## Limitations and assumptions
 
-* The endpoint named in the assignment is unusable (CAPTCHA / HTTP 404). The
-  default source is the TLUBN WFS registered in GeoMIS.Th for the same
-  dataset. If the assignment's endpoint becomes available with another
-  schema, `inspect` shows the difference before anything is loaded.
-* The publisher does not document whether `Sz_Num` is stable across releases.
-  If zones were renumbered, the old rows would be reported as
-  `absent_from_source` and the new numbers inserted; nothing is overwritten
-  silently.
 * The service has no result paging, so one request returns everything
   (12 MB for 3 090 zones). If the layer outgrows the server's CountDefault
   (25 000) or `WSG_MAX_FEATURES`, the run fails instead of truncating.
