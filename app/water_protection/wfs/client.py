@@ -226,6 +226,13 @@ class WfsClient:
             page = self._get_page(plan, params, geometry_property, "GetFeature")
             if len(page.features) > max_features:
                 raise RetrievalLimitExceeded(f"more than {max_features} features returned", operation="GetFeature")
+            # A server-side cap (CountDefault) cuts the answer short; catch it
+            # here too, for services that give no resultType=hits count.
+            if page.number_matched is not None and page.number_matched > len(page.features):
+                raise IncompleteRetrievalError(
+                    f"numberMatched={page.number_matched} but only {len(page.features)} features were returned",
+                    operation="GetFeature",
+                )
             yield page
             return
 

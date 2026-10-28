@@ -1,7 +1,7 @@
 """
 Source-to-destination attribute mapping.
 
-The mapping is data (``mappings/th_wsg_zonen.toml``), not code, so it
+The mapping is data (``mappings/th_wsg_hqsg.toml``), not code, so it
 can be audited and corrected without touching the pipeline. This
 module loads and validates it and applies it to raw features.
 
@@ -32,20 +32,40 @@ from app.water_protection.wfs.gml import RawFeature
 
 # Must stay in sync with the CHECK constraint in the staging schema
 # (verified by tests/water_protection/test_staging_sql.py).
-ZONE_CATEGORIES = ("ZONE_I", "ZONE_II", "ZONE_III", "ZONE_IIIA", "ZONE_IIIB", "UNKNOWN")
+ZONE_CATEGORIES = (
+    "ZONE_I",
+    "ZONE_II",
+    "ZONE_IIA",
+    "ZONE_IIB",
+    "ZONE_IIC",
+    "ZONE_III",
+    "ZONE_IIIA",
+    "ZONE_IIIB",
+    "ZONE_IIIC",
+    "HQSG_QUAL_I",
+    "HQSG_QUAL_II",
+    "HQSG_QUAL_III",
+    "HQSG_QUANT_A",
+    "HQSG_QUANT_B",
+    "UNKNOWN",
+)
 UNKNOWN_CATEGORY = "UNKNOWN"
 
 EXTRACTION_RATE_STATUSES = ("published", "missing", "unparseable", "not_published")
 
 _PROPERTY_NAME = re.compile(r"^[A-Za-z_][A-Za-z0-9_.\-:]*$")
+_WARNING_CODE = re.compile(r"^[a-z][a-z0-9_]*$")
 _DECIMAL = re.compile(r"^[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?$")
 _XSD_DATE = re.compile(
     r"^(\d{4})-(\d{2})-(\d{2})"
     r"(?:T\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?)?"
     r"(?:Z|[+-]\d{2}:\d{2})?$"
 )
+# Largest magnitude below which every integer has an exact double; an
+# identifier above it may already have been rounded by the service.
+_MAX_EXACT_DOUBLE_INTEGER = 2**53
 
-DEFAULT_MAPPING_RESOURCE = "th_wsg_zonen.toml"
+DEFAULT_MAPPING_RESOURCE = "th_wsg_hqsg.toml"
 
 
 # ==========================================================
@@ -59,6 +79,15 @@ class ZoneClass:
     category: str
     legal_description: str
     basis: str
+
+
+@dataclass(frozen=True)
+class SourceFlag:
+    """An exact source value that limits how a zone can be used (kept, with a warning)."""
+
+    property: str
+    value: str
+    warning: str
 
 
 @dataclass(frozen=True)
@@ -88,8 +117,10 @@ class LayerMapping:
     verification_note: str
     zone_id_property: str
     geometry_property: str
+    integer_identifiers: frozenset[str]
     fields: FieldMap
     zone_classes: dict[str, ZoneClass]
+    source_flags: tuple[SourceFlag, ...]
     digest: str
     source: str
 
@@ -105,10 +136,12 @@ class LayerMapping:
             prop = getattr(self.fields, item.name)
             if prop:
                 required[prop] = f"fields.{item.name}"
+        for flag in self.source_flags:
+            required.setdefault(flag.property, f"source_flag.{flag.warning}")
         return required
 
     def numeric_properties(self) -> tuple[str, ...]:
-        return tuple(p for p in (self.fields.extraction_rate,) if p)
+        return tuple(p for p in (self.fields.extraction_rate, *sorted(self.integer_identifiers)) if p)
 
 
 def load_mapping(path: Path | None = None) -> LayerMapping:
@@ -190,10 +223,33 @@ def _build_mapping(document: dict[str, Any], *, digest: str, source: str) -> Lay
     if field_map.zone_code and not zone_classes:
         raise MappingError("fields.zone_code is mapped but no [[zone_classification]] rows exist")
 
+    source_flags: list[SourceFlag] = []
+    for index, entry in enumerate(document.get("source_flag", [])):
+        where = f"source_flag[{index}]"
+        prop = property_name(entry.get("property", ""), f"{where}.property")
+        warning = required_str(entry, "warning", where)
+        value = entry.get("value")
+        if prop is None or not isinstance(value, str) or not value.strip():
+            raise MappingError(f"{where} needs a property and a non-empty value")
+        if not _WARNING_CODE.match(warning):
+            raise MappingError(f"{where}.warning {warning!r} must be lower_snake_case")
+        source_flags.append(SourceFlag(property=prop, value=value.strip(), warning=warning))
+
     zone_id = property_name(src.get("zone_id", ""), "source.zone_id")
     geometry = property_name(src.get("geometry", ""), "source.geometry")
     if zone_id is None or geometry is None:
         raise MappingError("source.zone_id and source.geometry are required")
+
+    raw_integer_ids = src.get("integer_identifiers", [])
+    if not isinstance(raw_integer_ids, list):
+        raise MappingError("source.integer_identifiers must be a list of property names")
+    integer_ids = {property_name(p, "source.integer_identifiers[]") for p in raw_integer_ids}
+    identifier_properties = {zone_id, field_map.protection_area_id}
+    if None in integer_ids or not integer_ids <= identifier_properties:
+        raise MappingError(
+            "source.integer_identifiers may only list the zone id and protection area id properties "
+            f"({sorted(p for p in identifier_properties if p)})"
+        )
 
     return LayerMapping(
         version=required_str(meta, "version", "mapping"),
@@ -203,8 +259,10 @@ def _build_mapping(document: dict[str, Any], *, digest: str, source: str) -> Lay
         verification_note=str(meta.get("verification_note", "")),
         zone_id_property=zone_id,
         geometry_property=geometry,
+        integer_identifiers=frozenset(p for p in integer_ids if p),
         fields=field_map,
         zone_classes=zone_classes,
+        source_flags=tuple(source_flags),
         digest=digest,
         source=source,
     )
@@ -257,6 +315,22 @@ def map_attributes(feature: RawFeature, mapping: LayerMapping) -> MappedAttribut
             "missing_source_zone_id",
             f"property {mapping.zone_id_property!r} is missing or empty",
         )
+    if mapping.zone_id_property in mapping.integer_identifiers:
+        normalized = integer_identifier(source_zone_id)
+        if normalized is None:
+            raise RecordRejected(
+                "invalid_source_zone_id",
+                f"{mapping.zone_id_property}={source_zone_id!r} is not a whole number",
+            )
+        source_zone_id = normalized
+
+    protection_area_id = _single(feature, fields_.protection_area_id)
+    if protection_area_id is not None and fields_.protection_area_id in mapping.integer_identifiers:
+        normalized = integer_identifier(protection_area_id)
+        if normalized is None:
+            warnings.append("protection_area_id_not_integer")
+        else:
+            protection_area_id = normalized
 
     if fields_.state_code:
         published_state = _single(feature, fields_.state_code)
@@ -281,10 +355,15 @@ def map_attributes(feature: RawFeature, mapping: LayerMapping) -> MappedAttribut
     if rate is not None and unit is None:
         warnings.append("extraction_rate_unit_unknown")
 
+    # Same matching rule as zone codes: exact after trimming outer whitespace.
+    for flag in mapping.source_flags:
+        if _single(feature, flag.property) == flag.value:
+            warnings.append(flag.warning)
+
     return MappedAttributes(
         source_zone_id=source_zone_id,
         state_code=mapping.state_code,
-        protection_area_id=_single(feature, fields_.protection_area_id),
+        protection_area_id=protection_area_id,
         protection_area_name=_single(feature, fields_.protection_area_name),
         zone_code_source=zone_code_raw if zone_code else None,
         zone_category=zone_class.category if zone_class else UNKNOWN_CATEGORY,
@@ -301,6 +380,33 @@ def map_attributes(feature: RawFeature, mapping: LayerMapping) -> MappedAttribut
         extraction_rate_status=rate_status,
         warnings=tuple(warnings),
     )
+
+
+def integer_identifier(value: str) -> str | None:
+    """
+    Canonical text of a whole-number identifier typed as xsd:double.
+
+    "5.53210009E8" and "553210009.0" both become "553210009". Fractions,
+    non-numeric text and values too large for an exact double give None.
+    """
+    value = value.strip()
+    if not _DECIMAL.match(value):
+        return None
+    number = Decimal(value)
+    if number != number.to_integral_value() or abs(number) > _MAX_EXACT_DOUBLE_INTEGER:
+        return None
+    return str(int(number))
+
+
+def zone_id_for_key(feature: RawFeature, mapping: LayerMapping) -> str | None:
+    """Best-effort source zone id for quarantine keys; never raises."""
+    raw = feature.properties.get(mapping.zone_id_property)
+    if not isinstance(raw, str) or not raw.strip():
+        return None
+    value = raw.strip()
+    if mapping.zone_id_property in mapping.integer_identifiers:
+        return integer_identifier(value) or value
+    return value
 
 
 def _raw(feature: RawFeature, prop: str | None) -> str | None:

@@ -39,7 +39,23 @@ from app.database.staging.base import StagingBase
 
 TARGET_SRID = 25832
 
-ZONE_CATEGORY_VALUES = ("ZONE_I", "ZONE_II", "ZONE_III", "ZONE_IIIA", "ZONE_IIIB", "UNKNOWN")
+ZONE_CATEGORY_VALUES = (
+    "ZONE_I",
+    "ZONE_II",
+    "ZONE_IIA",
+    "ZONE_IIB",
+    "ZONE_IIC",
+    "ZONE_III",
+    "ZONE_IIIA",
+    "ZONE_IIIB",
+    "ZONE_IIIC",
+    "HQSG_QUAL_I",
+    "HQSG_QUAL_II",
+    "HQSG_QUAL_III",
+    "HQSG_QUANT_A",
+    "HQSG_QUANT_B",
+    "UNKNOWN",
+)
 EXTRACTION_RATE_STATUS_VALUES = ("published", "missing", "unparseable", "not_published")
 VALIDATION_STATUS_VALUES = ("valid", "valid_with_warnings")
 RUN_STATUS_VALUES = ("succeeded", "succeeded_empty", "succeeded_with_rejections", "failed")

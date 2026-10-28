@@ -13,31 +13,47 @@ from tests.water_protection.conftest import fixture_bytes
 
 @pytest.fixture
 def schema():
-    return parse_feature_type_schema(fixture_bytes("describe_feature_type.xsd"), "th_wsg_zonen")
+    return parse_feature_type_schema(fixture_bytes("describe_feature_type.xsd"), "WASSER_UND_HEILQUELLENSCHUTZGEBIETE")
 
 
 def test_layer_properties_are_read_from_the_schema(schema) -> None:
+    # describe_feature_type.xsd is the recorded live schema (default XSD namespace, no prefix).
     names = [p.name for p in schema.properties]
-    assert names[:3] == ["zone_id", "wsg_nr", "wsg_name"]
-    assert schema.target_namespace == "https://example.invalid/wsg"
+    assert names[:3] == ["Gebiet_Nr", "Gebiet", "Sg_Id"]
+    assert schema.target_namespace == "http://www.geoproxy.geoportal-th.de/tmlnu"
 
-    zone = schema.get("zone")
-    assert zone is not None and zone.type_label == "xsd:string"  # inline restriction base
-    assert schema.get("datum_festsetzung").type_label == "xsd:date"
+    assert schema.get("Sz_Num").type_label == "xsd:double"
+    assert schema.get("Zone").type_label == "xsd:string"
+    assert schema.get("Stand").type_label == "xsd:date"
     geometry = schema.get("geom")
     assert geometry.is_geometry
-    assert geometry.type_label == "gml:MultiSurfacePropertyType"
+    assert geometry.type_label == "gml:GeometryPropertyType"
     assert [p.name for p in schema.geometry_properties] == ["geom"]
 
 
-def test_mapping_matches_fixture_schema(schema, mapping: LayerMapping) -> None:
+def test_inline_simple_type_uses_its_restriction_base() -> None:
+    content = b"""<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:gml="http://www.opengis.net/gml/3.2"
+        xmlns:t="https://wfs.test/t" targetNamespace="https://wfs.test/t">
+      <xsd:complexType name="LType"><xsd:complexContent><xsd:extension base="gml:AbstractFeatureType"><xsd:sequence>
+        <xsd:element name="Zone"><xsd:simpleType><xsd:restriction base="xsd:string"><xsd:maxLength value="10"/>
+        </xsd:restriction></xsd:simpleType></xsd:element>
+      </xsd:sequence></xsd:extension></xsd:complexContent></xsd:complexType>
+      <xsd:element name="L" type="t:LType" substitutionGroup="gml:AbstractFeature"/>
+    </xsd:schema>"""
+
+    assert parse_feature_type_schema(content, "L").get("Zone").type_label == "xsd:string"
+
+
+def test_mapping_matches_live_schema(schema, mapping: LayerMapping) -> None:
     check = check_schema_against_mapping(
         schema,
         required=mapping.required_properties(),
         geometry_property=mapping.geometry_property,
+        numeric=mapping.numeric_properties(),
     )
     # Present in the source but not mapped: kept in source_attributes, reported as drift.
-    assert check.unmapped_properties == ("bemerkung",)
+    assert check.unmapped_properties == ("Gebiet", "Gebiet_Nr", "Gebietsart", "Herkunft", "Scale", "Symbolik", "Url")
+    assert check.warnings == ()  # Sz_Num and Sg_Id are numeric, as integer identifiers must be
 
 
 def test_missing_mapped_properties_are_all_reported(schema, mapping: LayerMapping) -> None:
@@ -57,17 +73,17 @@ def test_missing_mapped_properties_are_all_reported(schema, mapping: LayerMappin
 
 def test_geometry_property_must_have_a_geometry_type(schema, mapping: LayerMapping) -> None:
     with pytest.raises(SchemaMismatchError, match="non-geometry type"):
-        check_schema_against_mapping(schema, required=mapping.required_properties(), geometry_property="wsg_name")
+        check_schema_against_mapping(schema, required=mapping.required_properties(), geometry_property="Name")
 
 
 def test_non_numeric_extraction_rate_property_is_flagged(schema, mapping: LayerMapping) -> None:
     check = check_schema_against_mapping(
         schema,
-        required={**mapping.required_properties(), "bemerkung": "fields.extraction_rate"},
+        required={**mapping.required_properties(), "Symbolik": "fields.extraction_rate"},
         geometry_property="geom",
-        numeric=("bemerkung",),
+        numeric=("Symbolik",),
     )
-    assert check.warnings == ("mapped numeric property 'bemerkung' is declared as xsd:string",)
+    assert check.warnings == ("mapped numeric property 'Symbolik' is declared as xsd:string",)
 
 
 def test_layer_missing_from_schema() -> None:

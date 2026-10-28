@@ -45,10 +45,10 @@ def test_validate_with_saved_response(tmp_path: Path, capsys: pytest.CaptureFixt
     assert code == 3  # completed, some features rejected
     assert printed == saved
     assert saved["status"] == "succeeded_with_rejections"
-    assert saved["counts"]["accepted"] == 9
-    assert saved["counts"]["exported"] == 9
+    assert saved["counts"]["accepted"] == 10
+    assert saved["counts"]["exported"] == 10
     assert saved["database"] is None
-    assert len(gpd.read_file(export_path)) == 9
+    assert len(gpd.read_file(export_path)) == 10
 
 
 @responses.activate
@@ -81,9 +81,13 @@ def test_inspect_records_capabilities_schema_and_sample(
     assert code == 0
     assert inspection["capabilities"]["version"] == "2.0.0"
     assert inspection["capabilities"]["implements_result_paging"] is True
-    assert inspection["layer_schema"]["element_name"] == "th_wsg_zonen"
-    assert inspection["mapping_check"] == {"matches": True, "unmapped_properties": ["bemerkung"], "warnings": []}
-    assert [s["gml_id"] for s in inspection["sample"]] == ["th_wsg_zonen.1", "th_wsg_zonen.2"]
+    assert inspection["layer_schema"]["element_name"] == "WASSER_UND_HEILQUELLENSCHUTZGEBIETE"
+    assert inspection["mapping_check"] == {
+        "matches": True,
+        "unmapped_properties": ["Gebiet", "Gebiet_Nr", "Gebietsart", "Herkunft", "Scale", "Symbolik", "Url"],
+        "warnings": [],
+    }
+    assert [s["gml_id"] for s in inspection["sample"]] == ["ID_WSG_HQSG.1", "ID_WSG_HQSG.2"]
     sample_request = [r for r in fake.requests_named("GetFeature") if "STARTINDEX" not in r][0]
     assert sample_request["COUNT"] == "2"
     assert json.loads(capsys.readouterr().out) == inspection

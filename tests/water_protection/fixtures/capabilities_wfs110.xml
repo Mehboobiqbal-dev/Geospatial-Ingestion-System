@@ -5,7 +5,7 @@
     xmlns:ows="http://www.opengis.net/ows"
     xmlns:ogc="http://www.opengis.net/ogc"
     xmlns:xlink="http://www.w3.org/1999/xlink"
-    xmlns:wsg="https://example.invalid/wsg">
+    xmlns:tmlnu="http://www.geoproxy.geoportal-th.de/tmlnu">
   <ows:ServiceIdentification>
     <ows:Title>Wasserschutzgebiete Thueringen (synthetic fixture, WFS 1.1.0)</ows:Title>
     <ows:ServiceType>WFS</ows:ServiceType>
@@ -26,7 +26,7 @@
   </ows:OperationsMetadata>
   <wfs:FeatureTypeList>
     <wfs:FeatureType>
-      <wfs:Name>wsg:th_wsg_zonen</wfs:Name>
+      <wfs:Name>tmlnu:WASSER_UND_HEILQUELLENSCHUTZGEBIETE</wfs:Name>
       <wfs:Title>Wasserschutzgebietszonen (synthetic)</wfs:Title>
       <wfs:DefaultSRS>urn:ogc:def:crs:EPSG::25832</wfs:DefaultSRS>
       <wfs:OutputFormats>

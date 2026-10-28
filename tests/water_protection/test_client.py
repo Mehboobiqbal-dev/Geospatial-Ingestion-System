@@ -19,7 +19,7 @@ FakeInstaller = Callable[[], FakeWfs]
 
 def fetch(client: WfsClient, *, page_size: int = 2, max_features: int = 100, max_pages: int = 10):
     capabilities, _ = client.get_capabilities()
-    plan = client.plan(capabilities, "th_wsg_zonen", page_size=page_size, sort_by="zone_id")
+    plan = client.plan(capabilities, "WASSER_UND_HEILQUELLENSCHUTZGEBIETE", page_size=page_size, sort_by="Sz_Num")
     return plan, client.fetch_all(plan, geometry_property="geom", max_features=max_features, max_pages=max_pages)
 
 
@@ -29,7 +29,7 @@ def test_paged_retrieval_requests_every_page_in_a_stable_order(client: WfsClient
 
     plan, result = fetch(client)
 
-    assert [f.properties["zone_id"] for f in result.features] == [f"TEST-Z-00{i}" for i in range(1, 6)]
+    assert [f.properties["Sz_Num"] for f in result.features] == [f"9.9000000{i}E8" for i in range(1, 6)]
     assert result.number_matched == 5
     assert result.pages == 3
     assert result.duplicate_features_collapsed == 0
@@ -38,10 +38,10 @@ def test_paged_retrieval_requests_every_page_in_a_stable_order(client: WfsClient
     assert [r["STARTINDEX"] for r in pages] == ["0", "2", "4"]
     first = pages[0]
     assert first["VERSION"] == "2.0.0"
-    assert first["TYPENAMES"] == "wsg:th_wsg_zonen"
-    assert first["NAMESPACES"] == "xmlns(wsg,https://example.invalid/wsg)"
+    assert first["TYPENAMES"] == "tmlnu:WASSER_UND_HEILQUELLENSCHUTZGEBIETE"
+    assert first["NAMESPACES"] == "xmlns(tmlnu,http://www.geoproxy.geoportal-th.de/tmlnu)"
     assert first["COUNT"] == "2"
-    assert first["SORTBY"] == "zone_id ASC"
+    assert first["SORTBY"] == "Sz_Num ASC"
     assert first["OUTPUTFORMAT"] == "application/gml+xml; version=3.2"
     assert "SRSNAME" not in first  # data is requested in its declared CRS and transformed locally
     assert "STARTINDEX" not in result.request_url
@@ -100,7 +100,7 @@ def test_repeated_feature_means_another_one_was_skipped(client: WfsClient, fake_
 @responses.activate
 def test_conflicting_repeat_aborts(client: WfsClient, fake_wfs: FakeInstaller) -> None:
     fake = fake_wfs()
-    fake.pages[2] = fake.pages[0].replace(b"Fassungsbereich", b"Geaendert")
+    fake.pages[2] = fake.pages[0].replace(b">festgesetzt<", b">aufgehoben<")
 
     with pytest.raises(IncompleteRetrievalError, match="different content"):
         fetch(client)
@@ -158,11 +158,44 @@ def test_wfs110_uses_one_bounded_request(client: WfsClient, fake_wfs: FakeInstal
 
     assert not plan.paging
     request = [r for r in fake.requests_named("GetFeature") if r.get("RESULTTYPE") != "hits"][0]
-    assert request["TYPENAME"] == "wsg:th_wsg_zonen"
+    assert request["TYPENAME"] == "tmlnu:WASSER_UND_HEILQUELLENSCHUTZGEBIETE"
     assert request["VERSION"] == "1.1.0"
     assert request["MAXFEATURES"] == "51"
     assert "STARTINDEX" not in request
-    assert [f.properties["zone_id"] for f in result.features] == ["TEST-Z-001", "TEST-Z-002"]
+    assert [f.properties["Sz_Num"] for f in result.features] == ["9.90000001E8", "9.90000002E8"]
+
+
+@responses.activate
+def test_live_service_without_paging_gets_one_bounded_sorted_request(
+    client: WfsClient, fake_wfs: FakeInstaller
+) -> None:
+    # The TLUBN service declares ImplementsResultPaging=FALSE (recorded capabilities).
+    fake = fake_wfs()
+    fake.capabilities = fixture_bytes("live_capabilities.xml")
+    fake.hits = collection([], number_matched=2, number_returned=0)
+    fake.single = fake.pages[0].replace(b'numberMatched="5"', b'numberMatched="2"')
+
+    plan, result = fetch(client, max_features=50)
+
+    assert not plan.paging
+    request = [r for r in fake.requests_named("GetFeature") if r.get("RESULTTYPE") != "hits"][0]
+    assert request["VERSION"] == "2.0.0"
+    assert request["COUNT"] == "51"  # one more than allowed, to detect truncation
+    assert request["SORTBY"] == "Sz_Num ASC"
+    assert "STARTINDEX" not in request
+    assert len(result.features) == 2
+
+
+@responses.activate
+def test_server_cap_without_hits_count_is_detected(client: WfsClient, fake_wfs: FakeInstaller) -> None:
+    # No resultType=hits answer, and the single response holds 2 of 5 matched features.
+    fake = fake_wfs()
+    fake.capabilities = fixture_bytes("live_capabilities.xml")
+    fake.overrides["hits"] = (400, fixture_bytes("exception_report.xml"))
+    fake.single = fake.pages[0]
+
+    with pytest.raises(IncompleteRetrievalError, match="numberMatched=5 but only 2 features"):
+        fetch(client, max_features=50)
 
 
 @responses.activate

@@ -10,6 +10,7 @@ import app.database.staging.models  # noqa: F401  (registers staging tables)
 from app.database.staging.base import STAGING_SCHEMA
 from app.database.staging.base import StagingBase
 from app.database.staging.guard import validate_staging_target
+from app.database.staging.repository import CONNECT_TIMEOUT_S
 from app.water_protection.config import StagingDatabaseSettings
 from app.water_protection.errors import StagingTargetRefused
 
@@ -47,7 +48,7 @@ def run_migrations_offline() -> None:
 
 def run_migrations_online() -> None:
     target = validate_staging_target(StagingDatabaseSettings())
-    engine = create_engine(target.url, poolclass=pool.NullPool)
+    engine = create_engine(target.url, poolclass=pool.NullPool, connect_args={"connect_timeout": CONNECT_TIMEOUT_S})
 
     with engine.connect() as connection:
         database, postgis = connection.execute(

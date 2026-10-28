@@ -43,7 +43,7 @@ def _normalise_format(value: str) -> str:
 
 @dataclass(frozen=True)
 class FeatureTypeInfo:
-    name: str  # as advertised, possibly prefixed (e.g. "wsg:th_wsg_zonen")
+    name: str  # as advertised, possibly prefixed (e.g. "tmlnu:WASSER_UND_HEILQUELLENSCHUTZGEBIETE")
     local_name: str
     prefix: str | None
     namespace_uri: str | None

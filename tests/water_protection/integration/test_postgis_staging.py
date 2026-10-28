@@ -107,10 +107,10 @@ def test_repeated_load_is_idempotent(engine: Engine, target: StagingTarget, proc
     first = load(engine, target, processed)
     second = load(engine, target, processed)
 
-    assert (first.inserted, first.updated, first.unchanged, first.quarantined) == (9, 0, 0, 8)
-    assert (second.inserted, second.updated, second.unchanged, second.quarantined) == (0, 0, 9, 8)
-    assert scalar(engine, "SELECT count(*) FROM iris_staging.water_protection_zones") == 9
-    assert scalar(engine, "SELECT count(*) FROM iris_staging.water_protection_zones_quarantine") == 8
+    assert (first.inserted, first.updated, first.unchanged, first.quarantined) == (10, 0, 0, 9)
+    assert (second.inserted, second.updated, second.unchanged, second.quarantined) == (0, 0, 10, 9)
+    assert scalar(engine, "SELECT count(*) FROM iris_staging.water_protection_zones") == 10
+    assert scalar(engine, "SELECT count(*) FROM iris_staging.water_protection_zones_quarantine") == 9
     assert scalar(engine, "SELECT max(occurrences) FROM iris_staging.water_protection_zones_quarantine") == 2
     # An unchanged row is not rewritten: updated_at still equals first_ingested_at.
     assert scalar(engine, "SELECT bool_and(updated_at = first_ingested_at) FROM iris_staging.water_protection_zones")
@@ -122,18 +122,18 @@ def test_changed_source_updates_only_that_row(
     load(engine, target, processed)
     snapshot = retrieve_from_file(FIXTURES / "getfeature_edge_cases.xml", mapping, default_srs=None)
     features = list(snapshot.features)
-    features[1] = replace(features[1], properties={**features[1].properties, "status": "aufgehoben"})
+    features[1] = replace(features[1], properties={**features[1].properties, "Status": "aufgehoben"})
     changed = process_snapshot(
         replace(snapshot, features=tuple(features)), mapping, GeometryPolicy(), IngestionReport(mode="load")
     )
 
     summary = load(engine, target, changed)
 
-    assert (summary.inserted, summary.updated, summary.unchanged) == (0, 1, 8)
+    assert (summary.inserted, summary.updated, summary.unchanged) == (0, 1, 9)
     assert (
         scalar(
             engine,
-            "SELECT legal_status_source FROM iris_staging.water_protection_zones WHERE source_zone_id = 'TEST-Z-002'",
+            "SELECT legal_status_source FROM iris_staging.water_protection_zones WHERE source_zone_id = '990000002'",
         )
         == "aufgehoben"
     )
@@ -186,14 +186,39 @@ def test_stored_geometry_and_classification(engine: Engine, target: StagingTarge
         assert (row["srid"], row["type"], row["valid"]) == (25832, "MULTIPOLYGON", True)
         assert shapely.from_wkb(bytes(row["wkb"])).equals_exact(expected[key].geometry.geometry, tolerance=1e-6)
         assert row["no_evidence"] is (not row["geometry_repaired"])
-    assert (by_id["TEST-Z-006"]["zone_category"], by_id["TEST-Z-006"]["zone_code_source"]) == ("UNKNOWN", "III A")
-    assert by_id["TEST-Z-007"]["geometry_repaired"] is True
+    assert (by_id["990000006"]["zone_category"], by_id["990000006"]["zone_code_source"]) == ("UNKNOWN", "III A")
+    assert by_id["990000007"]["geometry_repaired"] is True
+
+
+def test_recorded_live_excerpt_loads_with_every_category(
+    engine: Engine, target: StagingTarget, mapping: LayerMapping
+) -> None:
+    snapshot = retrieve_from_file(FIXTURES / "live_getfeature_excerpt.xml", mapping, default_srs=None)
+    live = process_snapshot(snapshot, mapping, GeometryPolicy(), IngestionReport(mode="load"))
+
+    first = load(engine, target, live)
+    second = load(engine, target, live)
+
+    assert (first.inserted, second.unchanged) == (11, 11)
+    with engine.connect() as connection:
+        rows = dict(
+            connection.execute(
+                text(
+                    "SELECT source_zone_id, zone_category || ' ' || array_to_string(validation_warnings, ',') "
+                    "FROM iris_staging.water_protection_zones"
+                )
+            ).all()
+        )
+    assert rows["553510025"] == "ZONE_I geometry_is_map_symbol"
+    assert rows["463320106"] == "ZONE_II geometry_repaired"
+    assert rows["523023001"] == "ZONE_IIC "
+    assert rows["482991001"] == "HQSG_QUANT_A "
 
 
 def test_database_constraints_reject_inconsistent_rows(
     engine: Engine, target: StagingTarget, processed: ProcessingResult
 ) -> None:
-    zone = next(z for z in processed.zones if z.key == "TEST-Z-002")
+    zone = next(z for z in processed.zones if z.key == "990000002")
     row = zone_row(zone, uuid.uuid4(), utc_now())
     row["extraction_rate"] = 500  # a rate without status "published" must never be stored
 
@@ -226,7 +251,7 @@ def test_parcel_screening_in_postgis_matches_python(
         )
 
     zones = {z.key: z.geometry.geometry for z in processed.zones}
-    assert {r["source_zone_id"] for r in rows} == {"TEST-Z-001", "TEST-Z-002"}
+    assert {r["source_zone_id"] for r in rows} == {"990000001", "990000002"}
     for row in rows:
         python = assess_parcel(parcel, zones[row["source_zone_id"]])
         assert row["within"] is (python.relation.value == "within")
@@ -243,11 +268,11 @@ def test_cli_load_records_runs(
     monkeypatch.chdir(tmp_path)
     source = str(FIXTURES / "getfeature_edge_cases.xml")
 
-    first = cli.main(["--log-level", "WARNING", "load", "--source-file", source, "--allow-unverified-mapping"])
-    second = cli.main(["--log-level", "WARNING", "load", "--source-file", source, "--allow-unverified-mapping"])
+    first = cli.main(["--log-level", "WARNING", "load", "--source-file", source])
+    second = cli.main(["--log-level", "WARNING", "load", "--source-file", source])
     broken = tmp_path / "broken.xml"
     broken.write_bytes(Path(FIXTURES / "html_challenge.html").read_bytes())
-    failed = cli.main(["--log-level", "WARNING", "load", "--source-file", str(broken), "--allow-unverified-mapping"])
+    failed = cli.main(["--log-level", "WARNING", "load", "--source-file", str(broken)])
     capsys.readouterr()
 
     assert (first, second, failed) == (3, 3, 1)
@@ -259,7 +284,7 @@ def test_cli_load_records_runs(
             )
         ).all()
     assert [tuple(r) for r in runs] == [
-        ("succeeded_with_rejections", 9, 0, None),
-        ("succeeded_with_rejections", 0, 9, None),
+        ("succeeded_with_rejections", 10, 0, None),
+        ("succeeded_with_rejections", 0, 10, None),
         ("failed", None, None, "UnexpectedContentError"),
     ]

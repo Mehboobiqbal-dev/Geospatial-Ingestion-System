@@ -21,8 +21,14 @@ from pydantic import field_validator
 from pydantic_settings import BaseSettings
 from pydantic_settings import SettingsConfigDict
 
-DEFAULT_WFS_URL = "https://geoportal.thueringen.de/wfs/wsg"
-DEFAULT_LAYER = "th_wsg_zonen"
+# The WFS of the TLUBN dataset "Wasserschutzgebiete (WSG), Heilquellen-
+# schutzgebiete (HQSG)" as registered in the Thuringian metadata catalogue
+# (GeoMIS.Th record c030866f-e305-4ba0-b96d-768cb02b550c). The endpoint named
+# in the assignment, https://geoportal.thueringen.de/wfs/wsg (layer
+# th_wsg_zonen), answers scripts with a CAPTCHA and browsers with HTTP 404;
+# it can still be selected with WSG_WFS_URL / WSG_LAYER.
+DEFAULT_WFS_URL = "https://www.geoproxy.geoportal-th.de/geoproxy/services/wsg_hqsg_wfs"
+DEFAULT_LAYER = "tmlnu:WASSER_UND_HEILQUELLENSCHUTZGEBIETE"
 DEFAULT_STATE_CODE = "TH"
 SUPPORTED_WFS_VERSIONS = ("2.0.0", "1.1.0")
 

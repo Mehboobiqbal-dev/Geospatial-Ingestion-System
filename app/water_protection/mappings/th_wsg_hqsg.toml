@@ -1,0 +1,155 @@
+# Source-to-destination mapping for the TLUBN layer
+# tmlnu:WASSER_UND_HEILQUELLENSCHUTZGEBIETE (water and healing-spring
+# protection zones of Thuringia).
+#
+# STATUS: VERIFIED against the live service on 2026-10-28
+#   WFS  https://www.geoproxy.geoportal-th.de/geoproxy/services/wsg_hqsg_wfs
+#   GetCapabilities, DescribeFeatureType and a full attribute download
+#   (3 090 features, Stand 2026-10-13). Dataset metadata: GeoMIS.Th record
+#   F64A2B67-4215-11D5-94EE-9291C676F748 (publisher TLUBN, CC BY 4.0,
+#   "© GDI-Th"). Findings are in docs/wsg_th/QUALITY_REPORT.md.
+#
+# If the publisher changes the schema, `inspect` reports the difference;
+# update the names below, bump version and re-run inspect.
+#
+# Conventions
+#   * A destination attribute mapped to "" is NOT PUBLISHED by the source:
+#     it stays NULL and the record carries an explicit status. Values are
+#     never derived from other attributes (for example an extraction rate
+#     is never parsed out of a name or remark).
+#   * Zone codes are matched EXACTLY after trimming outer whitespace. There
+#     is no case folding, no substring and no similarity matching. Any code
+#     not listed is stored with category UNKNOWN and its raw value preserved.
+
+[mapping]
+version = "2026-10-28.1"
+layer = "WASSER_UND_HEILQUELLENSCHUTZGEBIETE"
+state_code = "TH"
+schema_verified = true
+verification_note = "Verified against DescribeFeatureType and all 3090 features of the TLUBN WFS on 2026-10-28 (Stand 2026-10-13)."
+
+[source]
+# Sz_Num is the zone number: unique in all 3 090 features, and its fifth
+# digit always matches the zone code (1 = I, 2 = II*, 3 = III*, 6-9 = HQSG).
+# gml:id (ID_WSG_HQSG.<n>) is a row counter of the response and not stable.
+zone_id = "Sz_Num"
+geometry = "geom"
+# Typed xsd:double and published as e.g. "5.53210009E8"; stored as "553210009".
+integer_identifiers = ["Sz_Num", "Sg_Id"]
+
+[fields]
+state_code = ""                 # layer is Thuringia-only; state code comes from [mapping].state_code
+protection_area_id = "Sg_Id"    # protection area number, e.g. 101 -> tlubn.thueringen.de/.../wsg-101-steinheid
+protection_area_name = "Name"
+zone_code = "Zone"              # classified via [[zone_classification]]
+zone_label = ""                 # no separate zone designation text is published
+restriction_category = ""       # not published; restrictions are set by each area's ordinance
+legal_status = "Status"         # "festgesetzt" or "in Planung / in Verfahren", stored verbatim
+legal_basis = ""                # no ordinance reference is published
+legal_effective_date = ""       # no designation date is published
+source_modified_date = "Stand"  # data currency date of the extract (the same for every feature)
+extraction_rate = ""            # not published -> stays NULL ("not_published")
+extraction_rate_unit = ""
+
+# Exact source values that limit how a zone can be used. The zone is kept
+# and the warning is added to its validation_warnings.
+
+[[source_flag]]
+# All 625 zones remarked "Symbol" are zone I / QUAL I, and 598 of them are
+# identical 20 m x 20 m squares: a map symbol at the well, not the legal
+# boundary. Parcel screening against these needs the ordinance map.
+property = "Bemerkung"
+value = "Symbol"
+warning = "geometry_is_map_symbol"
+
+# Zone codes as listed in the dataset description (GeoMIS.Th
+# F64A2B67-4215-11D5-94EE-9291C676F748): drinking-water protection zones
+# I, II, IIA, IIB, IIC, III, IIIA, IIIB, IIIC and healing-spring protection
+# zones (qualitative I-III, quantitative A and B). The zone type names
+# follow DVGW Arbeitsblatt W 101. The legal restrictions of an individual
+# zone are set by its own ordinance (Paragraphs 51, 52 WHG for WSG,
+# Paragraph 53 WHG for HQSG); legal_description names the zone type only.
+
+[[zone_classification]]
+source_code = "I"
+category = "ZONE_I"
+legal_description = "Schutzzone I (Fassungsbereich)"
+basis = "TLUBN zone code (GeoMIS F64A2B67); DVGW W 101 zone type; legal effect per the individual WSG ordinance (Paragraphs 51, 52 WHG)"
+
+[[zone_classification]]
+source_code = "II"
+category = "ZONE_II"
+legal_description = "Schutzzone II (Engere Schutzzone)"
+basis = "TLUBN zone code (GeoMIS F64A2B67); DVGW W 101 zone type; legal effect per the individual WSG ordinance (Paragraphs 51, 52 WHG)"
+
+[[zone_classification]]
+source_code = "IIA"
+category = "ZONE_IIA"
+legal_description = "Schutzzone II A (Engere Schutzzone, Teilzone A)"
+basis = "TLUBN zone code (GeoMIS F64A2B67); subdivision of zone II; legal effect per the individual WSG ordinance (Paragraphs 51, 52 WHG)"
+
+[[zone_classification]]
+source_code = "IIB"
+category = "ZONE_IIB"
+legal_description = "Schutzzone II B (Engere Schutzzone, Teilzone B)"
+basis = "TLUBN zone code (GeoMIS F64A2B67); subdivision of zone II; legal effect per the individual WSG ordinance (Paragraphs 51, 52 WHG)"
+
+[[zone_classification]]
+source_code = "IIC"
+category = "ZONE_IIC"
+legal_description = "Schutzzone II C (Engere Schutzzone, Teilzone C)"
+basis = "TLUBN zone code (GeoMIS F64A2B67); subdivision of zone II; legal effect per the individual WSG ordinance (Paragraphs 51, 52 WHG)"
+
+[[zone_classification]]
+source_code = "III"
+category = "ZONE_III"
+legal_description = "Schutzzone III (Weitere Schutzzone)"
+basis = "TLUBN zone code (GeoMIS F64A2B67); DVGW W 101 zone type; legal effect per the individual WSG ordinance (Paragraphs 51, 52 WHG)"
+
+[[zone_classification]]
+source_code = "IIIA"
+category = "ZONE_IIIA"
+legal_description = "Schutzzone III A (Weitere Schutzzone, Teilzone A)"
+basis = "TLUBN zone code (GeoMIS F64A2B67); DVGW W 101 subdivision of zone III; legal effect per the individual WSG ordinance (Paragraphs 51, 52 WHG)"
+
+[[zone_classification]]
+source_code = "IIIB"
+category = "ZONE_IIIB"
+legal_description = "Schutzzone III B (Weitere Schutzzone, Teilzone B)"
+basis = "TLUBN zone code (GeoMIS F64A2B67); DVGW W 101 subdivision of zone III; legal effect per the individual WSG ordinance (Paragraphs 51, 52 WHG)"
+
+[[zone_classification]]
+source_code = "IIIC"
+category = "ZONE_IIIC"
+legal_description = "Schutzzone III C (Weitere Schutzzone, Teilzone C)"
+basis = "TLUBN zone code (GeoMIS F64A2B67); subdivision of zone III; legal effect per the individual WSG ordinance (Paragraphs 51, 52 WHG)"
+
+[[zone_classification]]
+source_code = "QUAL I"
+category = "HQSG_QUAL_I"
+legal_description = "Heilquellenschutzgebiet, qualitative Schutzzone I"
+basis = "TLUBN zone code (GeoMIS F64A2B67: qualitative Schutzzonen I-III); legal effect per the individual HQSG ordinance (Paragraph 53 WHG)"
+
+[[zone_classification]]
+source_code = "QUAL II"
+category = "HQSG_QUAL_II"
+legal_description = "Heilquellenschutzgebiet, qualitative Schutzzone II"
+basis = "TLUBN zone code (GeoMIS F64A2B67: qualitative Schutzzonen I-III); legal effect per the individual HQSG ordinance (Paragraph 53 WHG)"
+
+[[zone_classification]]
+source_code = "QUAL III"
+category = "HQSG_QUAL_III"
+legal_description = "Heilquellenschutzgebiet, qualitative Schutzzone III"
+basis = "TLUBN zone code (GeoMIS F64A2B67: qualitative Schutzzonen I-III); legal effect per the individual HQSG ordinance (Paragraph 53 WHG)"
+
+[[zone_classification]]
+source_code = "QUANT A"
+category = "HQSG_QUANT_A"
+legal_description = "Heilquellenschutzgebiet, quantitative Schutzzone A"
+basis = "TLUBN zone code (GeoMIS F64A2B67: quantitative Schutzzonen A, B); legal effect per the individual HQSG ordinance (Paragraph 53 WHG)"
+
+[[zone_classification]]
+source_code = "QUANT B"
+category = "HQSG_QUANT_B"
+legal_description = "Heilquellenschutzgebiet, quantitative Schutzzone B"
+basis = "TLUBN zone code (GeoMIS F64A2B67: quantitative Schutzzonen A, B); legal effect per the individual HQSG ordinance (Paragraph 53 WHG)"

@@ -81,11 +81,16 @@ for _table in (zones, quarantine, runs):
         raise StagingTargetRefused(f"table {_table.name} is not in {STAGING_SCHEMA}")
 
 
+# libpq waits indefinitely by default; an unreachable staging database must
+# fail the run instead of hanging it.
+CONNECT_TIMEOUT_S = 10
+
+
 def create_staging_engine(target: StagingTarget) -> Engine:
     return create_engine(
         target.url,
         pool_pre_ping=True,
-        connect_args={"application_name": "iris-wsg-th-ingest"},
+        connect_args={"application_name": "iris-wsg-th-ingest", "connect_timeout": CONNECT_TIMEOUT_S},
     )
 
 

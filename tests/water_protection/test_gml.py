@@ -18,11 +18,13 @@ GML2_NS = 'xmlns:gml="http://www.opengis.net/gml"'
 
 
 def parse(content: bytes):
-    return parse_feature_collection(content, layer_local_name="th_wsg_zonen", geometry_property="geom")
+    return parse_feature_collection(
+        content, layer_local_name="WASSER_UND_HEILQUELLENSCHUTZGEBIETE", geometry_property="geom"
+    )
 
 
 def single(geometry_xml: str):
-    return parse(collection([feature("f.1", zone_properties("Z-1", "I"), geometry_xml)])).features[0]
+    return parse(collection([feature("f.1", zone_properties("9.90000001E8", "I"), geometry_xml)])).features[0]
 
 
 def test_page_metadata_and_properties() -> None:
@@ -31,12 +33,12 @@ def test_page_metadata_and_properties() -> None:
     assert page.number_matched == 5
     assert page.number_returned == 2
     assert page.time_stamp == "2026-10-27T12:00:00Z"
-    assert [f.gml_id for f in page.features] == ["th_wsg_zonen.1", "th_wsg_zonen.2"]
+    assert [f.gml_id for f in page.features] == ["ID_WSG_HQSG.1", "ID_WSG_HQSG.2"]
 
     first = page.features[0]
-    assert first.properties["zone_id"] == "TEST-Z-001"
-    assert first.properties["zone"] == "I"
-    assert first.properties["bemerkung"] is None  # xsi:nil
+    assert first.properties["Sz_Num"] == "9.90000001E8"  # verbatim; normalised by the mapping
+    assert first.properties["Zone"] == "I"
+    assert first.properties["Bemerkung"] is None  # xsi:nil
     assert "geom" not in first.properties
     assert isinstance(first.geometry.shape, MultiPolygon)
     assert first.geometry.srs_name == "urn:ogc:def:crs:EPSG::25832"
@@ -117,12 +119,12 @@ def test_bad_geometries_are_captured_per_feature(geometry_xml: str, code: str, d
     assert parsed.geometry.error_code == code
     assert detail in (parsed.geometry.error_detail or "")
     # The feature itself (and its attributes) is still available for quarantine.
-    assert parsed.properties["zone_id"] == "Z-1"
+    assert parsed.properties["Sz_Num"] == "9.90000001E8"
 
 
 def test_missing_and_nil_geometry() -> None:
-    nil = parse(collection([feature("f.1", zone_properties("Z-1", "I"), None, nil_geometry=True)])).features[0]
-    absent = parse(collection([feature("f.2", zone_properties("Z-2", "I"), None)])).features[0]
+    nil = parse(collection([feature("f.1", zone_properties("9.90000001E8", "I"), None, nil_geometry=True)])).features[0]
+    absent = parse(collection([feature("f.2", zone_properties("9.90000002E8", "I"), None)])).features[0]
     for item in (nil, absent):
         assert item.geometry.shape is None
         assert item.geometry.error_code is None
@@ -135,13 +137,15 @@ def test_unknown_number_matched() -> None:
 
 
 def test_repeated_property_becomes_a_list() -> None:
-    content = collection([feature("f.1", zone_properties("Z-1", "I"), multisurface(polygon(square(0, 0, 1))))]).replace(
-        b"<wsg:zone>I</wsg:zone>", b"<wsg:zone>I</wsg:zone><wsg:zone>II</wsg:zone>"
-    )
-    assert parse(content).features[0].properties["zone"] == ["I", "II"]
+    content = collection(
+        [feature("f.1", zone_properties("9.90000001E8", "I"), multisurface(polygon(square(0, 0, 1))))]
+    ).replace(b"<tmlnu:Zone>I</tmlnu:Zone>", b"<tmlnu:Zone>I</tmlnu:Zone><tmlnu:Zone>II</tmlnu:Zone>")
+    assert parse(content).features[0].properties["Zone"] == ["I", "II"]
 
 
 def test_unexpected_feature_type_aborts() -> None:
-    content = collection([feature("f.1", {"zone_id": "Z-1"}, None)]).replace(b"th_wsg_zonen", b"other_type")
+    content = collection([feature("f.1", {"Sz_Num": "1"}, None)]).replace(
+        b"WASSER_UND_HEILQUELLENSCHUTZGEBIETE", b"other_type"
+    )
     with pytest.raises(SchemaMismatchError, match="unexpected feature type <other_type>"):
         parse(content)

@@ -1,29 +1,33 @@
-# Test fixtures (synthetic)
+# Test fixtures
 
-Every file in this directory is **synthetic**. None of it was retrieved from
-the Thuringia WFS: the endpoint `https://geoportal.thueringen.de/wfs/wsg`
-answered scripted requests with an HTML bot-protection page and browsers
-with HTTP 404 when it was inspected on 2026-10-27.
+Two kinds of files live here.
 
-The documents follow the structure of standard OGC WFS 2.0.0 / 1.1.0
-responses (GeoServer-style capabilities, XML Schema from
-DescribeFeatureType, GML 3.2 feature collections). Property names (`zone_id`,
-`wsg_nr`, `zone`, ...) match the **unverified** assumptions in
-`app/water_protection/mappings/th_wsg_zonen.toml`. Identifiers use the
-`TEST-` prefix and names start with "Synthetisches Testgebiet" so that no
-fixture record can be mistaken for an official zone.
+**Recorded** (file names start with `live_`, plus `describe_feature_type.xsd`):
+responses of the TLUBN WFS
+`https://www.geoproxy.geoportal-th.de/geoproxy/services/wsg_hqsg_wfs`, layer
+`tmlnu:WASSER_UND_HEILQUELLENSCHUTZGEBIETE`, retrieved on 2026-10-28 (data
+Stand 2026-10-13). Licence CC BY 4.0, attribution "© GDI-Th". Each file
+says in a leading comment what was changed (only that comment, and for the
+excerpt the `numberMatched`/`numberReturned` counts).
 
+**Synthetic**: everything else. These documents use the real element and
+property names but invented values: zone numbers `9900000nn`, protection
+areas `99001`/`99002`, names starting with "Synthetisches Testgebiet", so no
+fixture record can be mistaken for an official zone. Zone numbers are
+written the way the service writes `xsd:double` (`9.90000001E8`).
 Coordinates are in EPSG:25832 near Erfurt (E 640 000, N 5 650 000) unless a
 file states otherwise.
 
-| File | Purpose |
-|---|---|
-| `capabilities_wfs200.xml` | WFS 2.0.0 capabilities with paging, sorting and GML 3.2 output |
-| `capabilities_wfs110.xml` | WFS 1.1.0 capabilities (no standard paging) |
-| `describe_feature_type.xsd` | Layer schema for `th_wsg_zonen` |
-| `getfeature_hits.xml` | `resultType=hits` answer (numberMatched=5) |
-| `getfeature_page_0.xml`, `_2`, `_4` | Three pages (2 + 2 + 1 features) |
-| `getfeature_empty.xml` | Valid empty result |
-| `exception_report.xml` | OWS 1.1 exception report |
-| `html_challenge.html` | HTML page in place of XML (models the observed bot protection) |
-| `getfeature_edge_cases.xml` | One collection with valid, repairable and rejectable features, used for the example report |
+| File | Kind | Purpose |
+|---|---|---|
+| `live_capabilities.xml` | recorded | Real capabilities: no standard paging, CountDefault 25 000, sorting |
+| `describe_feature_type.xsd` | recorded | Real layer schema (15 properties) |
+| `live_getfeature_excerpt.xml` | recorded | 11 of 3 090 real features: map symbol, zone codes IIC/IIIC, healing-spring zones, multipart, the one geometry that needs repair, a remark "Beschluss nichtig" |
+| `capabilities_wfs200.xml` | synthetic | WFS 2.0.0 capabilities with paging, used to test the paging path |
+| `capabilities_wfs110.xml` | synthetic | WFS 1.1.0 capabilities (no standard paging) |
+| `getfeature_hits.xml` | synthetic | `resultType=hits` answer (numberMatched=5) |
+| `getfeature_page_0.xml`, `_2`, `_4` | synthetic | Three pages (2 + 2 + 1 features) |
+| `getfeature_empty.xml` | synthetic | Valid empty result |
+| `exception_report.xml` | synthetic | OWS 1.1 exception report |
+| `html_challenge.html` | synthetic | HTML page in place of XML (models the CAPTCHA served by the assignment's endpoint) |
+| `getfeature_edge_cases.xml` | synthetic | 20 features: valid, repairable and rejectable cases, used for the example report |

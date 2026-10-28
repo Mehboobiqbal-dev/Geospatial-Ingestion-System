@@ -1,0 +1,400 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- RECORDED EXCERPT of a live GetFeature response (not synthetic).
+     Source: TLUBN WFS https://www.geoproxy.geoportal-th.de/geoproxy/services/wsg_hqsg_wfs
+     layer tmlnu:WASSER_UND_HEILQUELLENSCHUTZGEBIETE, retrieved 2026-10-28T01:06:37Z, data Stand 2026-10-13.
+     Licence CC BY 4.0, attribution: (c) GDI-Th. 11 of 3090 members, unchanged;
+     numberMatched/numberReturned were set to the excerpt size. -->
+<wfs:FeatureCollection xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:wfs="http://www.opengis.net/wfs/2.0" xmlns:gml="http://www.opengis.net/gml/3.2" timeStamp="2026-10-28T01:06:37Z" numberMatched="11" numberReturned="11">
+  <wfs:member>
+    <tmlnu:WASSER_UND_HEILQUELLENSCHUTZGEBIETE xmlns:tmlnu="http://www.geoproxy.geoportal-th.de/tmlnu" gml:id="ID_WSG_HQSG.17">
+      <gml:name>31791.0</gml:name>
+      <tmlnu:Gebiet_Nr>31791.0</tmlnu:Gebiet_Nr>
+      <tmlnu:Gebiet>WSG</tmlnu:Gebiet>
+      <tmlnu:Sg_Id>1.0</tmlnu:Sg_Id>
+      <tmlnu:Name>WSG Heinersdorf</tmlnu:Name>
+      <tmlnu:Gebietsart>Wasserschutzzone</tmlnu:Gebietsart>
+      <tmlnu:Zone>I</tmlnu:Zone>
+      <tmlnu:Status>in Planung / in Verfahren</tmlnu:Status>
+      <tmlnu:Sz_Num>5.53510025E8</tmlnu:Sz_Num>
+      <tmlnu:Bemerkung>Symbol</tmlnu:Bemerkung>
+      <tmlnu:Symbolik>T, I, P</tmlnu:Symbolik>
+      <tmlnu:Url>https://tlubn.thueringen.de/wasser/wasserversorgung-abwasser/wasser-und-heilquellenschutzgebiete/wsg-1-heinersdorf</tmlnu:Url>
+      <tmlnu:Scale>25000.0</tmlnu:Scale>
+      <tmlnu:Stand>2026-10-13</tmlnu:Stand>
+      <tmlnu:geom>
+        <!--Inlined geometry 'ID_WSG_HQSG.17_TMLNU_GEOM'-->
+        <gml:Polygon gml:id="ID_WSG_HQSG.17_TMLNU_GEOM" srsName="EPSG:25832">
+          <gml:exterior>
+            <gml:LinearRing>
+              <gml:posList>681291.823 5594639.211 681311.806 5594640.018 681310.998 5594660.002 681291.015 5594659.194 681291.823 5594639.211</gml:posList>
+            </gml:LinearRing>
+          </gml:exterior>
+        </gml:Polygon>
+      </tmlnu:geom>
+    </tmlnu:WASSER_UND_HEILQUELLENSCHUTZGEBIETE>
+  </wfs:member>
+  <wfs:member>
+    <tmlnu:WASSER_UND_HEILQUELLENSCHUTZGEBIETE xmlns:tmlnu="http://www.geoproxy.geoportal-th.de/tmlnu" gml:id="ID_WSG_HQSG.341">
+      <gml:name>23397.0</gml:name>
+      <tmlnu:Gebiet_Nr>23397.0</tmlnu:Gebiet_Nr>
+      <tmlnu:Gebiet>WSG</tmlnu:Gebiet>
+      <tmlnu:Sg_Id>181.0</tmlnu:Sg_Id>
+      <tmlnu:Name>WSG Lerchenbergquelle</tmlnu:Name>
+      <tmlnu:Gebietsart>Wasserschutzzone</tmlnu:Gebietsart>
+      <tmlnu:Zone>I</tmlnu:Zone>
+      <tmlnu:Status>festgesetzt</tmlnu:Status>
+      <tmlnu:Sz_Num>5.12810073E8</tmlnu:Sz_Num>
+      <tmlnu:Symbolik>T, I, F</tmlnu:Symbolik>
+      <tmlnu:Url>https://tlubn.thueringen.de/wasser/wasserversorgung-abwasser/wasser-und-heilquellenschutzgebiete/wsg-181-lerchenbergquelle</tmlnu:Url>
+      <tmlnu:Scale>25000.0</tmlnu:Scale>
+      <tmlnu:Stand>2026-10-13</tmlnu:Stand>
+      <tmlnu:geom>
+        <!--Inlined geometry 'ID_WSG_HQSG.341_TMLNU_GEOM'-->
+        <gml:Polygon gml:id="ID_WSG_HQSG.341_TMLNU_GEOM" srsName="EPSG:25832">
+          <gml:exterior>
+            <gml:LinearRing>
+              <gml:posList>598566.150 5631197.502 598565.278 5631207.464 598557.086 5631201.729 598566.150 5631197.502</gml:posList>
+            </gml:LinearRing>
+          </gml:exterior>
+        </gml:Polygon>
+      </tmlnu:geom>
+    </tmlnu:WASSER_UND_HEILQUELLENSCHUTZGEBIETE>
+  </wfs:member>
+  <wfs:member>
+    <tmlnu:WASSER_UND_HEILQUELLENSCHUTZGEBIETE xmlns:tmlnu="http://www.geoproxy.geoportal-th.de/tmlnu" gml:id="ID_WSG_HQSG.2731">
+      <gml:name>23865.0</gml:name>
+      <tmlnu:Gebiet_Nr>23865.0</tmlnu:Gebiet_Nr>
+      <tmlnu:Gebiet>WSG</tmlnu:Gebiet>
+      <tmlnu:Sg_Id>489.0</tmlnu:Sg_Id>
+      <tmlnu:Name>WSG Sünna IV</tmlnu:Name>
+      <tmlnu:Gebietsart>Wasserschutzzone</tmlnu:Gebietsart>
+      <tmlnu:Zone>II</tmlnu:Zone>
+      <tmlnu:Status>festgesetzt</tmlnu:Status>
+      <tmlnu:Sz_Num>5.22620104E8</tmlnu:Sz_Num>
+      <tmlnu:Symbolik>T, II, F</tmlnu:Symbolik>
+      <tmlnu:Url>https://tlubn.thueringen.de/wasser/wasserversorgung-abwasser/wasser-und-heilquellenschutzgebiete</tmlnu:Url>
+      <tmlnu:Scale>25000.0</tmlnu:Scale>
+      <tmlnu:Stand>2026-10-13</tmlnu:Stand>
+      <tmlnu:geom>
+        <!--Inlined geometry 'ID_WSG_HQSG.2731_TMLNU_GEOM'-->
+        <gml:Polygon gml:id="ID_WSG_HQSG.2731_TMLNU_GEOM" srsName="EPSG:25832">
+          <gml:exterior>
+            <gml:LinearRing>
+              <gml:posList>572164.278 5627196.371 572047.304 5627277.900 571991.998 5627139.051 572164.278 5627196.371</gml:posList>
+            </gml:LinearRing>
+          </gml:exterior>
+        </gml:Polygon>
+      </tmlnu:geom>
+    </tmlnu:WASSER_UND_HEILQUELLENSCHUTZGEBIETE>
+  </wfs:member>
+  <wfs:member>
+    <tmlnu:WASSER_UND_HEILQUELLENSCHUTZGEBIETE xmlns:tmlnu="http://www.geoproxy.geoportal-th.de/tmlnu" gml:id="ID_WSG_HQSG.2006">
+      <gml:name>61176.0</gml:name>
+      <tmlnu:Gebiet_Nr>61176.0</tmlnu:Gebiet_Nr>
+      <tmlnu:Gebiet>WSG</tmlnu:Gebiet>
+      <tmlnu:Sg_Id>6.0</tmlnu:Sg_Id>
+      <tmlnu:Name>WSG Goldborn</tmlnu:Name>
+      <tmlnu:Gebietsart>Wasserschutzzone</tmlnu:Gebietsart>
+      <tmlnu:Zone>III</tmlnu:Zone>
+      <tmlnu:Status>in Planung / in Verfahren</tmlnu:Status>
+      <tmlnu:Sz_Num>5.43130054E8</tmlnu:Sz_Num>
+      <tmlnu:Symbolik>T, III, P</tmlnu:Symbolik>
+      <tmlnu:Url>https://tlubn.thueringen.de/wasser/wasserversorgung-abwasser/wasser-und-heilquellenschutzgebiete/wsg-6-goldborn</tmlnu:Url>
+      <tmlnu:Scale>25000.0</tmlnu:Scale>
+      <tmlnu:Stand>2026-10-13</tmlnu:Stand>
+      <tmlnu:geom>
+        <!--Inlined geometry 'ID_WSG_HQSG.2006_TMLNU_GEOM'-->
+        <gml:Polygon gml:id="ID_WSG_HQSG.2006_TMLNU_GEOM" srsName="EPSG:25832">
+          <gml:exterior>
+            <gml:LinearRing>
+              <gml:posList>640456.164 5596455.982 640362.040 5596850.418 640235.371 5596742.049 640143.894 5596659.216 640167.054 5596632.512 640176.743 5596610.298 640173.587 5596574.740 640456.164 5596455.982</gml:posList>
+            </gml:LinearRing>
+          </gml:exterior>
+        </gml:Polygon>
+      </tmlnu:geom>
+    </tmlnu:WASSER_UND_HEILQUELLENSCHUTZGEBIETE>
+  </wfs:member>
+  <wfs:member>
+    <tmlnu:WASSER_UND_HEILQUELLENSCHUTZGEBIETE xmlns:tmlnu="http://www.geoproxy.geoportal-th.de/tmlnu" gml:id="ID_WSG_HQSG.610">
+      <gml:name>57679.0</gml:name>
+      <tmlnu:Gebiet_Nr>57679.0</tmlnu:Gebiet_Nr>
+      <tmlnu:Gebiet>WSG</tmlnu:Gebiet>
+      <tmlnu:Sg_Id>222.0</tmlnu:Sg_Id>
+      <tmlnu:Name>WSG Talsperrensystem Ohra-Schmalwasser</tmlnu:Name>
+      <tmlnu:Gebietsart>Wasserschutzzone</tmlnu:Gebietsart>
+      <tmlnu:Zone>IIC</tmlnu:Zone>
+      <tmlnu:Status>in Planung / in Verfahren</tmlnu:Status>
+      <tmlnu:Sz_Num>5.23023001E8</tmlnu:Sz_Num>
+      <tmlnu:Symbolik>T, IIC, P</tmlnu:Symbolik>
+      <tmlnu:Url>https://tlubn.thueringen.de/wasser/wasserversorgung-abwasser/wasser-und-heilquellenschutzgebiete</tmlnu:Url>
+      <tmlnu:Scale>25000.0</tmlnu:Scale>
+      <tmlnu:Stand>2026-10-13</tmlnu:Stand>
+      <tmlnu:geom>
+        <!--Inlined geometry 'ID_WSG_HQSG.610_TMLNU_GEOM'-->
+        <gml:MultiSurface gml:id="ID_WSG_HQSG.610_TMLNU_GEOM" srsName="EPSG:25832">
+          <gml:surfaceMember>
+            <gml:Polygon gml:id="GEOMETRY_6ae0576c-6129-40a7-abe5-8f04624cb359" srsName="EPSG:25832">
+              <gml:exterior>
+                <gml:LinearRing>
+                  <gml:posList>614780.229 5618306.944 614782.284 5618309.857 614786.706 5618315.394 614791.338 5618320.738 614800.858 5618331.190 614836.890 5618370.077 614901.009 5618439.619 615029.451 5619286.522 615020.873 5619291.719 615021.771 5619315.121 615023.427 5619332.198 615023.025 5619361.847 615020.106 5619441.454 615020.679 5619450.539 615021.326 5619454.748 615022.331 5619458.628 615026.923 5619468.811 615029.404 5619474.299 615031.132 5619479.346 615032.012 5619483.339 615033.445 5619491.627 615035.215 5619499.610 615043.998 5619525.385 615045.552 5619533.764 615046.299 5619542.964 615046.620 5619552.595 615046.748 5619567.397 615046.738 5619746.509 615027.796 5619827.330 615002.279 5619764.744 615000.621 5619760.010 614999.145 5619753.369 614779.644 5618306.056 614780.229 5618306.944</gml:posList>
+                </gml:LinearRing>
+              </gml:exterior>
+            </gml:Polygon>
+          </gml:surfaceMember>
+          <gml:surfaceMember>
+            <gml:Polygon gml:id="GEOMETRY_8b618a1d-e232-4c4b-b2d3-93724098276c" srsName="EPSG:25832">
+              <gml:exterior>
+                <gml:LinearRing>
+                  <gml:posList>625669.716 5620205.330 625669.025 5620211.832 625667.490 5620218.188 625665.139 5620224.289 625662.012 5620230.031 625658.163 5620235.316 625653.656 5620240.053 625648.569 5620244.161 625401.132 5620399.951 624817.530 5620758.436 623509.345 5621562.007 623510.450 5621549.792 623512.733 5621535.412 623514.034 5621526.623 623514.856 5621517.144 623518.400 5621439.122 624712.359 5620705.716 625355.290 5620310.786 625348.039 5620252.584 625364.760 5620244.906 625393.255 5620238.929 625407.784 5620235.882 625408.606 5620215.618 625408.806 5620210.680 625412.090 5620129.701 625416.797 5620013.609 625392.847 5619987.388 625361.690 5619961.528 625324.027 5619923.888 625319.407 5619921.339 625312.383 5619815.206 625222.647 5618459.286 625215.268 5618347.796 625228.988 5618349.768 625230.083 5618324.960 625233.953 5618230.025 625235.505 5618190.043 625236.565 5618160.679 625237.130 5618145.018 625237.868 5618130.086 625238.225 5618125.151 625238.683 5618120.255 625239.287 5618115.416 625240.094 5618110.655 625241.183 5618106.003 625242.656 5618101.499 625244.539 5618097.276 625246.763 5618093.184 625249.202 5618089.174 625254.288 5618081.235 625256.732 5618077.226 625258.964 5618073.135 625260.861 5618068.913 625262.346 5618064.432 625263.455 5618059.804 625264.287 5618055.068 625264.349 5618054.595 625264.918 5618050.253 625265.405 5618045.383 625265.792 5618040.474 625266.621 5618025.618 625268.942 5617970.862 625271.430 5617916.167 625271.736 5617904.787 625271.761 5617898.522 625271.677 5617892.270 625271.471 5617886.328 625271.435 5617885.770 625257.453 5617881.155 625178.542 5617871.657 625176.437 5617849.417 625153.739 5617609.555 625153.556 5617603.593 625154.244 5617579.884 625154.264 5617579.310 625154.298 5617578.597 625155.343 5617559.542 625155.548 5617556.993 625156.000 5617553.753 625156.443 5617551.507 625159.785 5617536.364 625160.006 5617535.407 625160.877 5617532.255 625161.644 5617529.987 625169.317 5617509.002 625172.062 5617503.068 625175.369 5617497.804 625652.739 5616833.492 625766.111 5616675.721 625775.855 5616675.314 625782.290 5616674.049 625796.427 5616670.682 625822.080 5616656.147 625834.166 5616651.872 625849.043 5616647.313 625863.096 5616648.711 625870.127 5616649.610 625886.806 5616646.315 625899.020 5616638.869 625913.538 5616623.574 625924.413 5616600.189 625933.199 5616579.367 625935.511 5616554.974 625935.333 5616548.580 626046.487 5616497.770 626070.957 5616521.163 626088.069 5616536.809 626122.250 5616561.290 626227.062 5616469.128 626338.812 5616350.773 626327.705 5616333.966 626351.346 5616317.922 627187.559 5615750.429 627189.563 5615749.138 627192.408 5615747.525 627195.353 5615746.101 627196.896 5615745.447 627203.251 5615742.878 627204.739 5615742.304 627207.845 5615741.277 627210.794 5615740.504 627215.912 5615739.328 627216.130 5615739.279 627219.343 5615738.666 627222.519 5615738.273 627265.495 5615784.416 627276.059 5615794.457 627318.262 5615843.662 627324.056 5615849.517 627325.992 5615851.003 627323.980 5615852.521 627318.401 5615855.931 627312.425 5615858.583 627306.153 5615860.432 627299.694 5615861.447 627293.157 5615861.610 627286.656 5615860.919 627280.300 5615859.384 627276.404 5615857.990 627233.012 5615840.401 626251.535 5616506.476 626248.549 5616508.352 626192.304 5616540.982 626187.966 5616543.223 626094.109 5616586.035 625885.180 5616681.337 625791.645 5616811.502 625260.556 5617550.569 625256.688 5617561.160 625254.940 5617569.079 625254.153 5617583.429 625253.573 5617603.407 625295.471 5618046.139 625295.489 5618046.336 625295.584 5618047.547 625297.373 5618074.577 625382.392 5618080.753 625388.835 5618081.868 625395.077 5618083.814 625401.011 5618086.559 625406.536 5618090.055 625411.558 5618094.242 625415.990 5618099.049 625419.757 5618104.393 625422.795 5618110.183 625425.050 5618116.320 625426.485 5618122.699 625427.075 5618129.211 625426.810 5618135.744 625425.695 5618142.186 625423.748 5618148.428 625421.004 5618154.363 625417.508 5618159.888 625413.321 5618164.910 625408.514 5618169.342 625403.170 5618173.109 625397.380 5618176.146 625391.243 5618178.402 625384.864 5618179.837 625378.352 5618180.427 625373.501 5618180.312 625304.039 5618175.290 625435.950 5620146.447 625511.576 5620201.067 625513.341 5620201.805 625516.526 5620202.470 625524.705 5620202.476 625526.553 5620202.143 625529.805 5620201.083 625593.044 5620161.066 625596.554 5620159.040 625602.530 5620156.388 625608.802 5620154.539 625615.261 5620153.524 625621.797 5620153.361 625628.299 5620154.053 625634.655 5620155.587 625640.756 5620157.938 625646.498 5620161.065 625651.783 5620164.915 625656.520 5620169.421 625660.628 5620174.508 625664.037 5620180.087 625666.689 5620186.063 625668.539 5620192.335 625669.553 5620198.794 625669.716 5620205.330</gml:posList>
+                </gml:LinearRing>
+              </gml:exterior>
+            </gml:Polygon>
+          </gml:surfaceMember>
+          <gml:surfaceMember>
+            <gml:Polygon gml:id="GEOMETRY_066549b9-6170-4147-a4e5-9b5858c1e94a" srsName="EPSG:25832">
+              <gml:exterior>
+                <gml:LinearRing>
+                  <gml:posList>623402.924 5621627.378 623408.289 5621612.637 623411.767 5621605.979 623414.891 5621601.544 623420.402 5621597.088 623426.622 5621593.399 623460.600 5621578.011 623466.974 5621574.472 623470.327 5621573.365 623473.997 5621572.609 623481.910 5621571.766 623493.992 5621570.981 623494.909 5621570.875 623402.924 5621627.378</gml:posList>
+                </gml:LinearRing>
+              </gml:exterior>
+            </gml:Polygon>
+          </gml:surfaceMember>
+          <gml:surfaceMember>
+            <gml:Polygon gml:id="GEOMETRY_8ffc5933-1126-443a-92fc-34b0320f83c7" srsName="EPSG:25832">
+              <gml:exterior>
+                <gml:LinearRing>
+                  <gml:posList>615071.802 5619922.607 615077.432 5619927.031 615083.498 5619931.053 615092.463 5619937.209 615097.909 5619941.803 615103.000 5619946.723 615107.909 5619951.812 615119.929 5619964.765 615124.802 5619969.887 615129.809 5619974.885 615135.073 5619979.646 615140.704 5619984.069 615142.052 5619985.230 615146.039 5619988.764 615153.827 5619996.006 615159.250 5620000.620 615173.802 5620011.240 615183.193 5620017.003 615189.699 5620020.618 615192.888 5620022.486 615199.485 5620026.018 615202.706 5620027.856 615209.369 5620031.326 615212.634 5620033.123 615221.431 5620037.486 615580.060 5620917.124 615959.088 5621846.801 615938.377 5621893.049 615877.195 5621910.723 615474.643 5620923.350 615063.980 5619916.082 615071.802 5619922.607</gml:posList>
+                </gml:LinearRing>
+              </gml:exterior>
+            </gml:Polygon>
+          </gml:surfaceMember>
+          <gml:surfaceMember>
+            <gml:Polygon gml:id="GEOMETRY_096aa9d9-6051-4546-805d-1e3bb7b393a5" srsName="EPSG:25832">
+              <gml:exterior>
+                <gml:LinearRing>
+                  <gml:posList>622079.590 5622498.236 621984.869 5622440.926 623085.585 5621715.788 623154.156 5621720.764 623268.542 5621714.972 622079.590 5622498.236</gml:posList>
+                </gml:LinearRing>
+              </gml:exterior>
+            </gml:Polygon>
+          </gml:surfaceMember>
+          <gml:surfaceMember>
+            <gml:Polygon gml:id="GEOMETRY_c81cc2d1-c2dd-4a6b-9b3a-ebb685f9944f" srsName="EPSG:25832">
+              <gml:exterior>
+                <gml:LinearRing>
+                  <gml:posList>616263.133 5622592.575 616228.157 5622765.211 616228.395 5622772.166 616028.678 5622282.286 616078.815 5622253.914 616090.222 5622219.360 616108.482 5622213.238 616263.133 5622592.575</gml:posList>
+                </gml:LinearRing>
+              </gml:exterior>
+            </gml:Polygon>
+          </gml:surfaceMember>
+          <gml:surfaceMember>
+            <gml:Polygon gml:id="GEOMETRY_0e02bb78-0259-41df-b534-3b773f021a34" srsName="EPSG:25832">
+              <gml:exterior>
+                <gml:LinearRing>
+                  <gml:posList>617772.535 5623163.204 617764.885 5623195.189 617771.093 5623256.884 617549.768 5623329.236 616957.993 5623522.690 616871.817 5623550.861 616889.057 5623530.900 616909.489 5623496.549 616923.969 5623478.763 616946.033 5623421.428 617144.670 5623356.493 617277.413 5623313.098 617778.814 5623149.188 617772.535 5623163.204</gml:posList>
+                </gml:LinearRing>
+              </gml:exterior>
+            </gml:Polygon>
+          </gml:surfaceMember>
+          <gml:surfaceMember>
+            <gml:Polygon gml:id="GEOMETRY_8874c7ba-b41e-4117-b894-8880b22a642c" srsName="EPSG:25832">
+              <gml:exterior>
+                <gml:LinearRing>
+                  <gml:posList>616439.132 5623576.094 616449.660 5623581.667 616468.928 5623599.957 616477.412 5623609.748 616517.969 5623656.552 616520.407 5623658.982 616515.584 5623659.541 616509.048 5623659.704 616502.546 5623659.012 616474.093 5623652.512 616467.851 5623650.565 616464.840 5623649.290 616459.098 5623646.163 616441.890 5623635.094 616436.869 5623630.907 616432.437 5623626.101 616428.670 5623620.757 616425.633 5623614.967 616423.378 5623608.830 616421.943 5623602.451 616421.353 5623595.940 616421.618 5623589.407 616422.734 5623582.965 616424.681 5623576.723 616427.826 5623570.107 616439.132 5623576.094</gml:posList>
+                </gml:LinearRing>
+              </gml:exterior>
+            </gml:Polygon>
+          </gml:surfaceMember>
+        </gml:MultiSurface>
+      </tmlnu:geom>
+    </tmlnu:WASSER_UND_HEILQUELLENSCHUTZGEBIETE>
+  </wfs:member>
+  <wfs:member>
+    <tmlnu:WASSER_UND_HEILQUELLENSCHUTZGEBIETE xmlns:tmlnu="http://www.geoproxy.geoportal-th.de/tmlnu" gml:id="ID_WSG_HQSG.697">
+      <gml:name>33621.0</gml:name>
+      <tmlnu:Gebiet_Nr>33621.0</tmlnu:Gebiet_Nr>
+      <tmlnu:Gebiet>WSG</tmlnu:Gebiet>
+      <tmlnu:Sg_Id>24.0</tmlnu:Sg_Id>
+      <tmlnu:Name>WSG Talsperre Leibis/Lichte</tmlnu:Name>
+      <tmlnu:Gebietsart>Wasserschutzzone</tmlnu:Gebietsart>
+      <tmlnu:Zone>IIIC</tmlnu:Zone>
+      <tmlnu:Status>festgesetzt</tmlnu:Status>
+      <tmlnu:Sz_Num>5.33333001E8</tmlnu:Sz_Num>
+      <tmlnu:Symbolik>T, IIIC, F</tmlnu:Symbolik>
+      <tmlnu:Url>https://tlubn.thueringen.de/wasser/wasserversorgung-abwasser/wasser-und-heilquellenschutzgebiete/wsg-24-talsperre-leibis/lichte</tmlnu:Url>
+      <tmlnu:Scale>25000.0</tmlnu:Scale>
+      <tmlnu:Stand>2026-10-13</tmlnu:Stand>
+      <tmlnu:geom>
+        <!--Inlined geometry 'ID_WSG_HQSG.697_TMLNU_GEOM'-->
+        <gml:MultiSurface gml:id="ID_WSG_HQSG.697_TMLNU_GEOM" srsName="EPSG:25832">
+          <gml:surfaceMember>
+            <gml:Polygon gml:id="GEOMETRY_5967dda2-3e7d-4953-b03b-5df93e999973" srsName="EPSG:25832">
+              <gml:exterior>
+                <gml:LinearRing>
+                  <gml:posList>654320.783 5607619.020 656719.464 5609312.989 656707.942 5609329.068 656684.387 5609338.826 656665.562 5609347.334 656657.034 5609351.802 656642.304 5609360.641 656626.863 5609372.037 656613.262 5609384.605 654261.560 5607724.082 654239.648 5607714.510 654288.545 5607669.816 654318.970 5607618.229 654320.783 5607619.020</gml:posList>
+                </gml:LinearRing>
+              </gml:exterior>
+            </gml:Polygon>
+          </gml:surfaceMember>
+          <gml:surfaceMember>
+            <gml:Polygon gml:id="GEOMETRY_d2f4d452-6316-4e74-88a8-245b0fb125ea" srsName="EPSG:25832">
+              <gml:exterior>
+                <gml:LinearRing>
+                  <gml:posList>661217.038 5615357.807 661218.511 5615360.150 661122.293 5615431.486 661120.659 5615429.276 656747.937 5609532.671 656745.756 5609516.731 656811.671 5609467.943 656816.508 5609467.904 656842.573 5609466.247 656847.932 5609466.037 661217.038 5615357.807</gml:posList>
+                </gml:LinearRing>
+              </gml:exterior>
+            </gml:Polygon>
+          </gml:surfaceMember>
+        </gml:MultiSurface>
+      </tmlnu:geom>
+    </tmlnu:WASSER_UND_HEILQUELLENSCHUTZGEBIETE>
+  </wfs:member>
+  <wfs:member>
+    <tmlnu:WASSER_UND_HEILQUELLENSCHUTZGEBIETE xmlns:tmlnu="http://www.geoproxy.geoportal-th.de/tmlnu" gml:id="ID_WSG_HQSG.200">
+      <gml:name>32495.0</gml:name>
+      <tmlnu:Gebiet_Nr>32495.0</tmlnu:Gebiet_Nr>
+      <tmlnu:Gebiet>HQSG</tmlnu:Gebiet>
+      <tmlnu:Sg_Id>138.0</tmlnu:Sg_Id>
+      <tmlnu:Name>HQSG Bad Langensalza</tmlnu:Name>
+      <tmlnu:Gebietsart>HeilquellenSchutzzone</tmlnu:Gebietsart>
+      <tmlnu:Zone>QUAL I</tmlnu:Zone>
+      <tmlnu:Status>in Planung / in Verfahren</tmlnu:Status>
+      <tmlnu:Sz_Num>4.82960001E8</tmlnu:Sz_Num>
+      <tmlnu:Symbolik>S, qual I, P</tmlnu:Symbolik>
+      <tmlnu:Url>https://tlubn.thueringen.de/wasser/wasserversorgung-abwasser/wasser-und-heilquellenschutzgebiete</tmlnu:Url>
+      <tmlnu:Scale>25000.0</tmlnu:Scale>
+      <tmlnu:Stand>2026-10-13</tmlnu:Stand>
+      <tmlnu:geom>
+        <!--Inlined geometry 'ID_WSG_HQSG.200_TMLNU_GEOM'-->
+        <gml:Polygon gml:id="ID_WSG_HQSG.200_TMLNU_GEOM" srsName="EPSG:25832">
+          <gml:exterior>
+            <gml:LinearRing>
+              <gml:posList>615335.055 5663851.062 615352.813 5663851.786 615351.986 5663872.082 615334.227 5663871.358 615335.055 5663851.062</gml:posList>
+            </gml:LinearRing>
+          </gml:exterior>
+        </gml:Polygon>
+      </tmlnu:geom>
+    </tmlnu:WASSER_UND_HEILQUELLENSCHUTZGEBIETE>
+  </wfs:member>
+  <wfs:member>
+    <tmlnu:WASSER_UND_HEILQUELLENSCHUTZGEBIETE xmlns:tmlnu="http://www.geoproxy.geoportal-th.de/tmlnu" gml:id="ID_WSG_HQSG.201">
+      <gml:name>32496.0</gml:name>
+      <tmlnu:Gebiet_Nr>32496.0</tmlnu:Gebiet_Nr>
+      <tmlnu:Gebiet>HQSG</tmlnu:Gebiet>
+      <tmlnu:Sg_Id>138.0</tmlnu:Sg_Id>
+      <tmlnu:Name>HQSG Bad Langensalza</tmlnu:Name>
+      <tmlnu:Gebietsart>HeilquellenSchutzzone</tmlnu:Gebietsart>
+      <tmlnu:Zone>QUANT A</tmlnu:Zone>
+      <tmlnu:Status>in Planung / in Verfahren</tmlnu:Status>
+      <tmlnu:Sz_Num>4.82991001E8</tmlnu:Sz_Num>
+      <tmlnu:Symbolik>S, quan A, P</tmlnu:Symbolik>
+      <tmlnu:Url>https://tlubn.thueringen.de/wasser/wasserversorgung-abwasser/wasser-und-heilquellenschutzgebiete</tmlnu:Url>
+      <tmlnu:Scale>25000.0</tmlnu:Scale>
+      <tmlnu:Stand>2026-10-13</tmlnu:Stand>
+      <tmlnu:geom>
+        <!--Inlined geometry 'ID_WSG_HQSG.201_TMLNU_GEOM'-->
+        <gml:Polygon gml:id="ID_WSG_HQSG.201_TMLNU_GEOM" srsName="EPSG:25832">
+          <gml:exterior>
+            <gml:LinearRing>
+              <gml:posList>615237.114 5663711.488 615408.012 5663810.699 615380.235 5664004.390 615199.246 5663977.131 615237.114 5663711.488</gml:posList>
+            </gml:LinearRing>
+          </gml:exterior>
+        </gml:Polygon>
+      </tmlnu:geom>
+    </tmlnu:WASSER_UND_HEILQUELLENSCHUTZGEBIETE>
+  </wfs:member>
+  <wfs:member>
+    <tmlnu:WASSER_UND_HEILQUELLENSCHUTZGEBIETE xmlns:tmlnu="http://www.geoproxy.geoportal-th.de/tmlnu" gml:id="ID_WSG_HQSG.381">
+      <gml:name>23830.0</gml:name>
+      <tmlnu:Gebiet_Nr>23830.0</tmlnu:Gebiet_Nr>
+      <tmlnu:Gebiet>WSG</tmlnu:Gebiet>
+      <tmlnu:Sg_Id>192.0</tmlnu:Sg_Id>
+      <tmlnu:Name>WSG Albaquelle Oberalba</tmlnu:Name>
+      <tmlnu:Gebietsart>Wasserschutzzone</tmlnu:Gebietsart>
+      <tmlnu:Zone>I</tmlnu:Zone>
+      <tmlnu:Status>festgesetzt</tmlnu:Status>
+      <tmlnu:Sz_Num>5.22610051E8</tmlnu:Sz_Num>
+      <tmlnu:Symbolik>T, I, F</tmlnu:Symbolik>
+      <tmlnu:Url>https://tlubn.thueringen.de/wasser/wasserversorgung-abwasser/wasser-und-heilquellenschutzgebiete</tmlnu:Url>
+      <tmlnu:Scale>25000.0</tmlnu:Scale>
+      <tmlnu:Stand>2026-10-13</tmlnu:Stand>
+      <tmlnu:geom>
+        <!--Inlined geometry 'ID_WSG_HQSG.381_TMLNU_GEOM'-->
+        <gml:MultiSurface gml:id="ID_WSG_HQSG.381_TMLNU_GEOM" srsName="EPSG:25832">
+          <gml:surfaceMember>
+            <gml:Polygon gml:id="GEOMETRY_8699558a-5419-40f9-9f72-799b7e0272ba" srsName="EPSG:25832">
+              <gml:exterior>
+                <gml:LinearRing>
+                  <gml:posList>576891.112 5619799.158 576875.348 5619823.002 576865.332 5619805.454 576860.089 5619796.267 576891.112 5619799.158</gml:posList>
+                </gml:LinearRing>
+              </gml:exterior>
+            </gml:Polygon>
+          </gml:surfaceMember>
+          <gml:surfaceMember>
+            <gml:Polygon gml:id="GEOMETRY_bdcb1f12-9dea-4c0a-a8f6-c71b6c17e78e" srsName="EPSG:25832">
+              <gml:exterior>
+                <gml:LinearRing>
+                  <gml:posList>576882.831 5619852.040 576866.717 5619869.891 576858.256 5619847.370 576882.831 5619852.040</gml:posList>
+                </gml:LinearRing>
+              </gml:exterior>
+            </gml:Polygon>
+          </gml:surfaceMember>
+        </gml:MultiSurface>
+      </tmlnu:geom>
+    </tmlnu:WASSER_UND_HEILQUELLENSCHUTZGEBIETE>
+  </wfs:member>
+  <wfs:member>
+    <tmlnu:WASSER_UND_HEILQUELLENSCHUTZGEBIETE xmlns:tmlnu="http://www.geoproxy.geoportal-th.de/tmlnu" gml:id="ID_WSG_HQSG.766">
+      <gml:name>16428.0</gml:name>
+      <tmlnu:Gebiet_Nr>16428.0</tmlnu:Gebiet_Nr>
+      <tmlnu:Gebiet>WSG</tmlnu:Gebiet>
+      <tmlnu:Sg_Id>25.0</tmlnu:Sg_Id>
+      <tmlnu:Name>WSG Bretleben</tmlnu:Name>
+      <tmlnu:Gebietsart>Wasserschutzzone</tmlnu:Gebietsart>
+      <tmlnu:Zone>II</tmlnu:Zone>
+      <tmlnu:Status>festgesetzt</tmlnu:Status>
+      <tmlnu:Sz_Num>4.63320106E8</tmlnu:Sz_Num>
+      <tmlnu:Symbolik>T, II, F</tmlnu:Symbolik>
+      <tmlnu:Url>https://tlubn.thueringen.de/wasser/wasserversorgung-abwasser/wasser-und-heilquellenschutzgebiete</tmlnu:Url>
+      <tmlnu:Scale>25000.0</tmlnu:Scale>
+      <tmlnu:Stand>2026-10-13</tmlnu:Stand>
+      <tmlnu:geom>
+        <!--Inlined geometry 'ID_WSG_HQSG.766_TMLNU_GEOM'-->
+        <gml:Polygon gml:id="ID_WSG_HQSG.766_TMLNU_GEOM" srsName="EPSG:25832">
+          <gml:exterior>
+            <gml:LinearRing>
+              <gml:posList>654977.800 5688617.769 655000.502 5688619.460 655008.018 5688620.020 655012.133 5688620.326 655020.768 5688620.969 655016.764 5688718.873 654984.718 5688716.864 654980.777 5688716.617 654973.028 5688716.132 654924.935 5688713.116 654928.939 5688615.212 654977.800 5688617.769 654977.799 5688617.773 654973.274 5688637.473 654993.793 5688643.065 654999.522 5688622.908 654995.792 5688622.783 654977.822 5688617.775 654977.800 5688617.769</gml:posList>
+            </gml:LinearRing>
+          </gml:exterior>
+        </gml:Polygon>
+      </tmlnu:geom>
+    </tmlnu:WASSER_UND_HEILQUELLENSCHUTZGEBIETE>
+  </wfs:member>
+  <wfs:member>
+    <tmlnu:WASSER_UND_HEILQUELLENSCHUTZGEBIETE xmlns:tmlnu="http://www.geoproxy.geoportal-th.de/tmlnu" gml:id="ID_WSG_HQSG.1442">
+      <gml:name>17237.0</gml:name>
+      <tmlnu:Gebiet_Nr>17237.0</tmlnu:Gebiet_Nr>
+      <tmlnu:Gebiet>WSG</tmlnu:Gebiet>
+      <tmlnu:Sg_Id>301.0</tmlnu:Sg_Id>
+      <tmlnu:Name>WSG Pfaffenteich Fischbach</tmlnu:Name>
+      <tmlnu:Gebietsart>Wasserschutzzone</tmlnu:Gebietsart>
+      <tmlnu:Zone>III</tmlnu:Zone>
+      <tmlnu:Status>in Planung / in Verfahren</tmlnu:Status>
+      <tmlnu:Sz_Num>5.43030028E8</tmlnu:Sz_Num>
+      <tmlnu:Bemerkung>Beschluss nichtig; in Betrieb</tmlnu:Bemerkung>
+      <tmlnu:Symbolik>T, III, P</tmlnu:Symbolik>
+      <tmlnu:Url>https://tlubn.thueringen.de/wasser/wasserversorgung-abwasser/wasser-und-heilquellenschutzgebiete</tmlnu:Url>
+      <tmlnu:Scale>25000.0</tmlnu:Scale>
+      <tmlnu:Stand>2026-10-13</tmlnu:Stand>
+      <tmlnu:geom>
+        <!--Inlined geometry 'ID_WSG_HQSG.1442_TMLNU_GEOM'-->
+        <gml:Polygon gml:id="ID_WSG_HQSG.1442_TMLNU_GEOM" srsName="EPSG:25832">
+          <gml:exterior>
+            <gml:LinearRing>
+              <gml:posList>621436.027 5599099.087 621445.523 5599109.314 621448.445 5599115.888 621452.775 5599234.741 621294.851 5599289.198 621201.367 5599352.731 621128.757 5599181.192 621244.932 5599085.893 621436.027 5599099.087</gml:posList>
+            </gml:LinearRing>
+          </gml:exterior>
+        </gml:Polygon>
+      </tmlnu:geom>
+    </tmlnu:WASSER_UND_HEILQUELLENSCHUTZGEBIETE>
+  </wfs:member>
+</wfs:FeatureCollection>

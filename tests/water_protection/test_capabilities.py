@@ -20,12 +20,15 @@ def test_wfs200_capabilities() -> None:
     assert caps.implements_sorting
     assert caps.count_default == 1000
     assert "hits" in caps.result_types
-    assert [ft.name for ft in caps.feature_types] == ["wsg:th_wsg_zonen", "wsg:th_wsg_gebiete"]
+    assert [ft.name for ft in caps.feature_types] == [
+        "tmlnu:WASSER_UND_HEILQUELLENSCHUTZGEBIETE",
+        "tmlnu:WASSERSCHUTZGEBIETE",
+    ]
 
-    layer = caps.find_feature_type("th_wsg_zonen")
-    assert layer.name == "wsg:th_wsg_zonen"
-    assert layer.prefix == "wsg"
-    assert layer.namespace_uri == "https://example.invalid/wsg"
+    layer = caps.find_feature_type("WASSER_UND_HEILQUELLENSCHUTZGEBIETE")
+    assert layer.name == "tmlnu:WASSER_UND_HEILQUELLENSCHUTZGEBIETE"
+    assert layer.prefix == "tmlnu"
+    assert layer.namespace_uri == "http://www.geoproxy.geoportal-th.de/tmlnu"
     assert layer.default_crs == "urn:ogc:def:crs:EPSG::25832"
     assert "urn:ogc:def:crs:EPSG::31468" in layer.other_crs
     assert layer.wgs84_bbox == (9.87, 50.20, 12.65, 51.65)
@@ -38,16 +41,30 @@ def test_wfs110_capabilities_have_no_standard_paging() -> None:
     assert caps.version == "1.1.0"
     assert not caps.is_wfs2
     assert not caps.implements_result_paging
-    layer = caps.find_feature_type("wsg:th_wsg_zonen")
+    layer = caps.find_feature_type("tmlnu:WASSER_UND_HEILQUELLENSCHUTZGEBIETE")
     assert layer.default_crs == "urn:ogc:def:crs:EPSG::25832"
     assert caps.select_output_format(layer) == "text/xml; subtype=gml/3.1.1"
+
+
+def test_recorded_live_capabilities() -> None:
+    # Recorded from the TLUBN service on 2026-10-28: no standard paging, so
+    # the client plans one bounded request.
+    caps = parse_capabilities(fixture_bytes("live_capabilities.xml"))
+
+    assert caps.version == "2.0.0"
+    assert not caps.implements_result_paging
+    assert caps.implements_sorting
+    assert caps.count_default == 25000
+    layer = caps.find_feature_type("tmlnu:WASSER_UND_HEILQUELLENSCHUTZGEBIETE")
+    assert layer.default_crs == "EPSG:25832"
+    assert caps.select_output_format(layer) == "application/gml+xml; version=3.2"
 
 
 def test_missing_layer_lists_available_layers() -> None:
     caps = parse_capabilities(fixture_bytes("capabilities_wfs200.xml"))
 
-    with pytest.raises(CapabilitiesError, match="wsg:th_wsg_gebiete") as excinfo:
-        caps.find_feature_type("th_wsg_unknown")
+    with pytest.raises(CapabilitiesError, match="tmlnu:WASSERSCHUTZGEBIETE") as excinfo:
+        caps.find_feature_type("th_wsg_zonen")
     assert "not advertised" in str(excinfo.value)
 
 
@@ -58,7 +75,7 @@ def test_only_unsupported_output_formats_is_an_error() -> None:
     caps = parse_capabilities(content)
 
     with pytest.raises(CapabilitiesError, match="no supported GML output format"):
-        caps.select_output_format(caps.find_feature_type("th_wsg_zonen"))
+        caps.select_output_format(caps.find_feature_type("WASSER_UND_HEILQUELLENSCHUTZGEBIETE"))
 
 
 def test_html_page_is_reported_as_bot_protection() -> None:

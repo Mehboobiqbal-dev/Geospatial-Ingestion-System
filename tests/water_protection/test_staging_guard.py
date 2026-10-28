@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import pytest
 
+from app.database.staging import repository
 from app.database.staging.guard import validate_staging_target
 from app.water_protection import cli
 from app.water_protection.config import StagingDatabaseSettings
@@ -32,6 +33,16 @@ def test_valid_staging_target() -> None:
 def test_plain_postgresql_url_uses_psycopg3() -> None:
     target = validate_staging_target(settings(IRIS_STAGING_DATABASE_URL=GOOD_URL.replace("+psycopg", "")))
     assert target.url.drivername == "postgresql+psycopg"
+
+
+def test_staging_engine_has_a_connect_timeout(monkeypatch: pytest.MonkeyPatch) -> None:
+    # Without it libpq can wait forever on an unreachable host instead of failing the run.
+    captured: dict[str, object] = {}
+    monkeypatch.setattr(repository, "create_engine", lambda url, **kwargs: captured.update(kwargs))
+
+    repository.create_staging_engine(validate_staging_target(settings()))
+
+    assert captured["connect_args"] == {"application_name": "iris-wsg-th-ingest", "connect_timeout": 10}
 
 
 @pytest.mark.parametrize(

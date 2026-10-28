@@ -135,11 +135,11 @@ def test_repeated_load_is_idempotent(processed: ProcessingResult) -> None:
     first = load(db, processed.zones, processed.quarantined)
     second = load(db, processed.zones, processed.quarantined)
 
-    assert (first.inserted, first.updated, first.unchanged) == (9, 0, 0)
-    assert (second.inserted, second.updated, second.unchanged) == (0, 0, 9)
+    assert (first.inserted, first.updated, first.unchanged) == (10, 0, 0)
+    assert (second.inserted, second.updated, second.unchanged) == (0, 0, 10)
     assert first.batches == second.batches == 3
-    assert len(db.zones) == 9
-    assert len(db.quarantine) == 8  # keyed, so a second run adds no rows
+    assert len(db.zones) == 10
+    assert len(db.quarantine) == 9  # keyed, so a second run adds no rows
     assert {row["occurrences"] for row in db.quarantine.values()} == {2}
 
 
@@ -147,11 +147,11 @@ def test_changed_zone_is_updated_and_nothing_else(processed: ProcessingResult) -
     db = InMemoryStaging()
     load(db, processed.zones)
 
-    changed = [replace(z, content_hash="f" * 64) if z.key == "TEST-Z-002" else z for z in processed.zones]
+    changed = [replace(z, content_hash="f" * 64) if z.key == "990000002" else z for z in processed.zones]
     summary = load(db, changed)
 
-    assert (summary.inserted, summary.updated, summary.unchanged) == (0, 1, 8)
-    assert db.zones[("TH", "TEST-Z-002")]["content_hash"] == "f" * 64
+    assert (summary.inserted, summary.updated, summary.unchanged) == (0, 1, 9)
+    assert db.zones[("TH", "990000002")]["content_hash"] == "f" * 64
 
 
 def test_failure_in_a_later_batch_rolls_back_the_whole_load(processed: ProcessingResult) -> None:
@@ -181,13 +181,13 @@ def test_rows_missing_from_the_source_are_reported_not_deleted(processed: Proces
     db = InMemoryStaging()
     load(db, processed.zones)
 
-    rejected_now = replace(processed.quarantined[0], source_zone_id="TEST-Z-003", record_key="TEST-Z-003")
-    remaining = [z for z in processed.zones if z.key not in {"TEST-Z-003", "TEST-Z-004"}]
+    rejected_now = replace(processed.quarantined[0], source_zone_id="990000003", record_key="990000003")
+    remaining = [z for z in processed.zones if z.key not in {"990000003", "990000004"}]
     summary = load(db, remaining, [rejected_now])
 
-    assert summary.absent_from_source == ["TEST-Z-004"]
-    assert summary.stale_after_rejection == ["TEST-Z-003"]
-    assert ("TH", "TEST-Z-004") in db.zones  # kept for review
+    assert summary.absent_from_source == ["990000004"]
+    assert summary.stale_after_rejection == ["990000003"]
+    assert ("TH", "990000004") in db.zones  # kept for review
     assert summary.to_dict()["absent_from_source"] == 1
 
 

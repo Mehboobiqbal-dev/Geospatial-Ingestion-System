@@ -1,35 +1,31 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- SYNTHETIC FIXTURE: DescribeFeatureType for th_wsg_zonen; property names are the unverified mapping assumptions. -->
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:gml="http://www.opengis.net/gml/3.2"
-    xmlns:wsg="https://example.invalid/wsg"
-    targetNamespace="https://example.invalid/wsg"
-    elementFormDefault="qualified">
-  <xsd:import namespace="http://www.opengis.net/gml/3.2" schemaLocation="http://schemas.opengis.net/gml/3.2.1/gml.xsd"/>
-  <xsd:complexType name="th_wsg_zonenType">
-    <xsd:complexContent>
-      <xsd:extension base="gml:AbstractFeatureType">
-        <xsd:sequence>
-          <xsd:element name="zone_id" type="xsd:string" minOccurs="0" nillable="true"/>
-          <xsd:element name="wsg_nr" type="xsd:string" minOccurs="0" nillable="true"/>
-          <xsd:element name="wsg_name" type="xsd:string" minOccurs="0" nillable="true"/>
-          <xsd:element name="zone" minOccurs="0" nillable="true">
-            <xsd:simpleType>
-              <xsd:restriction base="xsd:string">
-                <xsd:maxLength value="10"/>
-              </xsd:restriction>
-            </xsd:simpleType>
-          </xsd:element>
-          <xsd:element name="zone_bez" type="xsd:string" minOccurs="0" nillable="true"/>
-          <xsd:element name="status" type="xsd:string" minOccurs="0" nillable="true"/>
-          <xsd:element name="rechtsgrundlage" type="xsd:string" minOccurs="0" nillable="true"/>
-          <xsd:element name="datum_festsetzung" type="xsd:date" minOccurs="0" nillable="true"/>
-          <xsd:element name="aenderungsdatum" type="xsd:date" minOccurs="0" nillable="true"/>
-          <xsd:element name="bemerkung" type="xsd:string" minOccurs="0" nillable="true"/>
-          <xsd:element name="geom" type="gml:MultiSurfacePropertyType" minOccurs="0" nillable="true"/>
-        </xsd:sequence>
-      </xsd:extension>
-    </xsd:complexContent>
-  </xsd:complexType>
-  <xsd:element name="th_wsg_zonen" type="wsg:th_wsg_zonenType" substitutionGroup="gml:AbstractFeature"/>
-</xsd:schema>
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- RECORDED from the live TLUBN WFS https://www.geoproxy.geoportal-th.de/geoproxy/services/wsg_hqsg_wfs
+     on 2026-10-28 (DescribeFeatureType); unchanged apart from this comment. Licence CC BY 4.0, (c) GDI-Th. -->
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gss="http://www.isotc211.org/2005/gss" xmlns:gsr="http://www.isotc211.org/2005/gsr" xmlns:gts="http://www.isotc211.org/2005/gts" xmlns:tmlnu="http://www.geoproxy.geoportal-th.de/tmlnu" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:xlink="http://www.w3.org/1999/xlink" targetNamespace="http://www.geoproxy.geoportal-th.de/tmlnu" elementFormDefault="qualified" attributeFormDefault="unqualified">
+  <import namespace="http://www.opengis.net/gml/3.2" schemaLocation="http://schemas.opengis.net/gml/3.2.1/gml.xsd"/>
+  <element name="AbstractFeature" type="gml:AbstractFeatureType" abstract="true" substitutionGroup="gml:AbstractFeature"/>
+  <element name="WASSER_UND_HEILQUELLENSCHUTZGEBIETE" type="tmlnu:WASSER_UND_HEILQUELLENSCHUTZGEBIETEType" substitutionGroup="gml:AbstractFeature"/>
+  <complexType name="WASSER_UND_HEILQUELLENSCHUTZGEBIETEType">
+    <complexContent>
+      <extension base="gml:AbstractFeatureType">
+        <sequence>
+          <element name="Gebiet_Nr" minOccurs="0" type="double"/>
+          <element name="Gebiet" minOccurs="0" type="string"/>
+          <element name="Sg_Id" minOccurs="0" type="double"/>
+          <element name="Name" minOccurs="0" type="string"/>
+          <element name="Gebietsart" minOccurs="0" type="string"/>
+          <element name="Zone" minOccurs="0" type="string"/>
+          <element name="Status" minOccurs="0" type="string"/>
+          <element name="Sz_Num" minOccurs="0" type="double"/>
+          <element name="Bemerkung" minOccurs="0" type="string"/>
+          <element name="Symbolik" minOccurs="0" type="string"/>
+          <element name="Url" minOccurs="0" type="string"/>
+          <element name="Scale" minOccurs="0" type="double"/>
+          <element name="Herkunft" minOccurs="0" type="string"/>
+          <element name="Stand" minOccurs="0" type="date"/>
+          <element name="geom" minOccurs="0" type="gml:GeometryPropertyType"/>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+</schema>

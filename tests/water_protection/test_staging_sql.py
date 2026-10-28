@@ -15,6 +15,7 @@ from sqlalchemy.dialects import postgresql
 
 from app.database.staging.base import STAGING_SCHEMA
 from app.database.staging.base import StagingBase
+from app.database.staging.models import ZONE_CATEGORY_VALUES
 from app.database.staging.repository import build_quarantine_upsert
 from app.database.staging.repository import build_zone_upsert
 from app.database.staging.repository import quarantine_row
@@ -83,13 +84,13 @@ def test_quarantine_upsert_counts_repeat_sightings(processed) -> None:
 
 
 def test_zone_rows_have_explicit_nulls_for_unpublished_values(processed) -> None:
-    row = zone_row(next(z for z in processed.zones if z.key == "TEST-Z-015"), RUN_ID, NOW)
+    row = zone_row(next(z for z in processed.zones if z.key == "990000015"), RUN_ID, NOW)
     assert row["zone_category"] == "UNKNOWN"
     assert row["zone_legal_description"] is None
     assert row["extraction_rate"] is None
     assert row["extraction_rate_status"] == "not_published"
     assert row["geometry_repair_evidence"] is None
-    assert row["source_attributes"]["gml:id"] == "th_wsg_zonen.15"
+    assert row["source_attributes"]["gml:id"] == "ID_WSG_HQSG.15"
 
 
 def test_offline_migration_sql_touches_only_iris_staging(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -108,6 +109,12 @@ def test_offline_migration_sql_touches_only_iris_staging(monkeypatch: pytest.Mon
     )
     assert "geometry(MULTIPOLYGON,25832)" in sql
     assert "CONSTRAINT uq_water_protection_zones_source_key UNIQUE (state_code, source_zone_id)" in sql
+    # The second revision widens the category check to the model's full list.
+    categories = ", ".join(f"'{c}'" for c in ZONE_CATEGORY_VALUES)
+    assert (
+        "ALTER TABLE iris_staging.water_protection_zones ADD CONSTRAINT "
+        f"ck_water_protection_zones_zone_category_allowed CHECK (zone_category IN ({categories}))"
+    ) in sql
     assert "iris_core" not in sql
     created = set(re.findall(r"CREATE TABLE (\w+)\.", sql))
     assert created == {"iris_staging"}

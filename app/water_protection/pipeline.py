@@ -32,6 +32,7 @@ from app.water_protection.geometry import normalize_geometry
 from app.water_protection.loader import LoadSummary
 from app.water_protection.mapping import LayerMapping
 from app.water_protection.mapping import map_attributes
+from app.water_protection.mapping import zone_id_for_key
 from app.water_protection.records import QuarantinedFeature
 from app.water_protection.records import StagedZone
 from app.water_protection.records import compute_content_hash
@@ -258,8 +259,7 @@ def _quarantine(
 ) -> QuarantinedFeature:
     shape = feature.geometry.shape
     wkb = shapely.to_wkb(shape) if shape is not None and not shape.is_empty else None
-    raw_id = feature.properties.get(mapping.zone_id_property)
-    source_id = raw_id.strip() if isinstance(raw_id, str) and raw_id.strip() else None
+    source_id = zone_id_for_key(feature, mapping)
     if source_id:
         key, kind = source_id, "source_zone_id"
     elif feature.gml_id:

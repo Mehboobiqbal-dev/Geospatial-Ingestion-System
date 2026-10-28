@@ -11,11 +11,13 @@ SRS_4326 = "urn:ogc:def:crs:EPSG::4326"
 
 Coords = Sequence[tuple[float, float]]
 
+LAYER = "WASSER_UND_HEILQUELLENSCHUTZGEBIETE"
+
 NAMESPACES = (
     'xmlns:wfs="http://www.opengis.net/wfs/2.0" '
     'xmlns:gml="http://www.opengis.net/gml/3.2" '
     'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" '
-    'xmlns:wsg="https://example.invalid/wsg"'
+    'xmlns:tmlnu="http://www.geoproxy.geoportal-th.de/tmlnu"'
 )
 
 
@@ -54,14 +56,14 @@ def feature(
     parts = []
     for name, value in properties.items():
         if value is None:
-            parts.append(f'<wsg:{name} xsi:nil="true"/>')
+            parts.append(f'<tmlnu:{name} xsi:nil="true"/>')
         else:
-            parts.append(f"<wsg:{name}>{escape(value)}</wsg:{name}>")
+            parts.append(f"<tmlnu:{name}>{escape(value)}</tmlnu:{name}>")
     if nil_geometry:
-        parts.append('<wsg:geom xsi:nil="true"/>')
+        parts.append('<tmlnu:geom xsi:nil="true"/>')
     elif geometry is not None:
-        parts.append(f"<wsg:geom>{geometry}</wsg:geom>")
-    return f'<wsg:th_wsg_zonen gml:id="{gml_id}">{"".join(parts)}</wsg:th_wsg_zonen>'
+        parts.append(f"<tmlnu:geom>{geometry}</tmlnu:geom>")
+    return f'<tmlnu:{LAYER} gml:id="{gml_id}">{"".join(parts)}</tmlnu:{LAYER}>'
 
 
 def collection(
@@ -82,28 +84,25 @@ def collection(
 
 
 def zone_properties(
-    zone_id: str | None,
+    sz_num: str | None,
     zone: str | None,
     *,
-    wsg_nr: str = "TEST-WSG-01",
+    sg_id: str = "99001.0",
     name: str = "Synthetisches Testgebiet Nord",
     **extra: str | None,
 ) -> dict[str, str | None]:
-    props: dict[str, str | None] = {}
-    if zone_id is not None:
-        props["zone_id"] = zone_id
-    props.update(
-        {
-            "wsg_nr": wsg_nr,
-            "wsg_name": name,
-            "zone": zone,
-            "zone_bez": extra.pop("zone_bez", "Synthetische Zone"),
-            "status": extra.pop("status", "festgesetzt"),
-            "rechtsgrundlage": extra.pop("rechtsgrundlage", "Testverordnung Nr. 1 (synthetisch)"),
-            "datum_festsetzung": extra.pop("datum_festsetzung", "2001-05-14"),
-            "aenderungsdatum": extra.pop("aenderungsdatum", "2019-03-01"),
-            "bemerkung": extra.pop("bemerkung", None),
-        }
-    )
+    """Properties in the order of the live TLUBN schema; synthetic values."""
+    props: dict[str, str | None] = {
+        "Gebiet": extra.pop("Gebiet", "WSG"),
+        "Sg_Id": sg_id,
+        "Name": name,
+        "Gebietsart": extra.pop("Gebietsart", "Wasserschutzzone"),
+        "Zone": zone,
+        "Status": extra.pop("Status", "festgesetzt"),
+    }
+    if sz_num is not None:
+        props["Sz_Num"] = sz_num
+    props["Bemerkung"] = extra.pop("Bemerkung", None)
+    props["Stand"] = extra.pop("Stand", "2019-03-01")
     props.update(extra)
     return props
