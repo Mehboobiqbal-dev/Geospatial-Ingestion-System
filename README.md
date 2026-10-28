@@ -10,13 +10,14 @@ Built with **Python**, **PostgreSQL/PostGIS**, **GeoPandas**, **PyDeck**, **Stre
 
 ## IRIS-WSG-TH: Thuringia Water Protection Zones
 
-Staging ingestion of the official Thuringia water protection zones (TLUBN WFS, layer `th_wsg_zonen`) into `iris_staging.water_protection_zones` (PostGIS, EPSG:25832), with parcel-level containment and intersection checks. It runs separately from the platform and never writes to `iris_core`.
+Staging ingestion of the official Thuringia water protection zones (TLUBN WFS, layer `tmlnu:WASSER_UND_HEILQUELLENSCHUTZGEBIETE`) into `iris_staging.water_protection_zones` (PostGIS, EPSG:25832), with parcel-level containment and intersection checks. It runs separately from the platform and never writes to `iris_core`.
 
 ```bash
 cp .env.example .env
 docker compose --profile wsg up -d postgis-staging
 docker compose --profile wsg run --rm wsg-ingest init-db
 docker compose --profile wsg run --rm wsg-tests
+docker compose --profile wsg run --rm wsg-ingest load   # live TLUBN data, 3 090 zones
 ```
 
 Documentation: [docs/wsg_th/README.md](docs/wsg_th/README.md) · Quality and error report: [docs/wsg_th/QUALITY_REPORT.md](docs/wsg_th/QUALITY_REPORT.md)
